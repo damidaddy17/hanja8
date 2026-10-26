@@ -1,0 +1,1327 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-title" content="8급 한자 탐험">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="apple-touch-icon.png">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}[hidden]{display:none!important}img{max-width:100%}</style>
+<title>아빠와 8급 한자 탐험</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jua&family=Gowun+Dodum&family=LXGW+WenKai+TC:wght@400;700&display=swap">
+<style>
+/* Layout: 깍두기 공책 한 장 위에 카드가 놓인 느낌. 가로 아이패드는 2단(설명 | 쓰기판), 좁으면 1단.
+   한 가지 화면(밝은 공책)으로 의도적으로 고정한 디자인 — 모든 색을 명시함. */
+:root{
+  --paper:#EAF2FB;      /* 연한 하늘색 공책 바탕 */
+  --accent:#2B6CC4;     /* 수현이가 좋아하는 파랑 */
+  --accent-deep:#1A4C96;
+  --sheet:#FFFFFF;
+  --ink:#1B2A3D;        /* 먹색 */
+  --ink-soft:#56677C;
+  --line:#D2DEEC;
+  --grid:#8FB3DE;       /* 공책 파란 칸 */
+  --ghost:#DCE5F0;
+  --stamp:#D23A2E;      /* 인주: 도장·틀림 표시에만 */
+  --sun:#F2B632;        /* 칭찬 스티커 */
+  --sky:#1F5FBF;        /* 펜슬 잉크 */
+  --leaf:#2E8B57;
+  --f-display:"Jua","Apple SD Gothic Neo",sans-serif;
+  --f-body:"Gowun Dodum","Apple SD Gothic Neo",sans-serif;
+  --f-han:"LXGW WenKai TC","Kaiti TC","STKaiti",serif;   /* 해서체: 교과서 손글씨처럼 획이 그대로 보임 */
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{background:var(--paper);color:var(--ink)}
+body{font-family:var(--f-body);font-size:17px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px;
+  -webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible{outline:3px solid var(--sky);outline-offset:2px}
+.wrap{max-width:860px;margin:0 auto}
+.han{font-family:var(--f-han);font-weight:700}
+/* 서체 최고 굵기(700)보다 조금 더 굵게: 같은 색 테두리를 덧그림 */
+.han,.word .h,.ctab,.choice.han,.qbody .sent u{-webkit-text-stroke:.028em currentColor;paint-order:stroke fill}
+h1,h2,h3{font-family:var(--f-display);font-weight:400;margin:0;text-wrap:balance;line-height:1.25}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);display:flex;align-items:center;gap:12px;padding-block:14px 10px;flex-wrap:wrap}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.brand{display:flex;align-items:center;gap:10px;margin-right:auto}
+.brand .seal{width:44px;height:44px;border-radius:10px;background:var(--stamp);color:#fff;display:grid;place-items:center;font-family:var(--f-han);font-weight:700;font-size:26px;transform:rotate(-4deg);background:var(--accent)}
+.brand h1{font-size:24px}
+.brand h1 span{font-family:var(--f-body);font-size:15px;color:var(--ink-soft);white-space:nowrap}
+.nav{display:flex;gap:6px;background:var(--sheet);border:1px solid var(--line);border-radius:999px;padding:4px}
+.nav button{padding:8px 16px;border-radius:999px;font-family:var(--f-display);font-size:17px;color:var(--ink-soft)}
+.nav button[aria-current="true"]{background:var(--accent-deep);color:#fff}
+.mockchip{font-size:13px;background:var(--sun);color:var(--ink);padding:4px 10px;border-radius:6px;font-weight:700}
+
+.sheet{background:var(--sheet);border:1px solid var(--line);border-radius:18px}
+.sec{display:grid;gap:14px;margin-top:26px}
+.sec>h2{font-size:22px;display:flex;align-items:baseline;gap:10px}
+.sec>h2 small{font-family:var(--f-body);font-size:14px;color:var(--ink-soft)}
+
+/* home: today */
+.today{display:grid;grid-template-columns:minmax(0,1fr);overflow:hidden}
+.today .main{padding:30px 32px 32px;display:grid;gap:18px;align-content:start}
+.dayhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.today .eyebrow{font-family:var(--f-display);font-size:20px;color:var(--accent);margin-right:auto}
+.today .eyebrow span{color:var(--ink-soft);font-size:16px}
+.planbtn{font-family:var(--f-display);font-size:17px;padding:10px 16px;border-radius:12px;background:var(--paper);border:1.5px solid var(--grid);color:var(--accent-deep)}
+.steps{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.steps i{height:8px;border-radius:99px;background:var(--line)}
+.steps i.done{background:var(--leaf)}
+.steps i.cur{background:var(--accent)}
+.today h2{font-size:40px}
+.today .chars{display:grid;grid-template-columns:repeat(5,minmax(0,72px));gap:10px}
+.today .chars span{aspect-ratio:1;display:grid;place-items:center;font-size:44px;border:2px solid var(--grid);border-radius:6px;background:var(--sheet)}
+.today .meta{color:var(--ink-soft);font-size:17px;line-height:1.7}
+.today .btn{min-height:60px;font-size:22px;padding:0 30px}
+.tabhead{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:8px}
+.tabhead h2{font-size:30px}
+.tabhead .scope{font-family:var(--f-display);font-size:17px;color:var(--accent);margin-right:auto}
+.scopenote{margin:0;color:var(--ink-soft);font-size:16px}
+.emptynote{padding:28px;display:grid;gap:12px;justify-items:start}
+.emptynote h3{font-size:24px}
+.emptynote p{margin:0;color:var(--ink-soft)}
+.lesson.done,.play.done{background:#F2F9F4;border-color:#BFE0CB}
+.play{position:relative}
+.cstamp{position:absolute;top:12px;right:12px;width:52px;height:52px;border-radius:50%;border:2.5px solid var(--stamp);color:var(--stamp);display:grid;place-items:center;font-family:var(--f-display);font-size:15px;transform:rotate(-12deg);background:rgba(255,255,255,.75)}
+.best{font-size:13px;color:var(--leaf);font-weight:700}
+.donebanner{margin-top:14px;padding:18px 22px;display:flex;gap:20px;align-items:center;background:#F2F9F4;border-color:#BFE0CB}
+.donebanner h3{font-size:26px;color:var(--leaf)}
+.donebanner p{margin:4px 0 0;color:var(--ink-soft)}
+.bigstamp{width:88px;height:88px;flex:none;border-radius:50%;border:4px solid var(--stamp);color:var(--stamp);display:grid;place-items:center;text-align:center;font-family:var(--f-display);font-size:17px;line-height:1.15;transform:rotate(-12deg);background:var(--sheet)}
+.choice.picked{border-color:var(--accent);background:#E3EEFB}
+.btn:disabled{opacity:.35;cursor:default}
+.etime{margin-left:auto;font-family:var(--f-display);font-size:24px;font-variant-numeric:tabular-nums;color:var(--accent)}
+.enav{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.confirmbar{margin-top:10px;padding:14px 16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.confirmbar span{margin-right:auto}
+.passmsg{margin:0;color:var(--leaf);font-family:var(--f-display);font-size:24px}
+.failmsg{margin:0;color:var(--accent);font-family:var(--f-display);font-size:20px}
+.wtitle{font-size:20px}
+.wrongs{display:grid;gap:8px}
+.wrong{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 12px;padding:12px 14px;border:1px solid var(--line);border-radius:12px}
+.wn{grid-row:span 2;font-family:var(--f-display);color:var(--stamp)}
+.wq{font-size:17px}
+.wq u{text-decoration:none;border-bottom:2px solid var(--accent);font-family:var(--f-han);font-weight:700;font-size:20px}
+.wq .han{font-size:22px}
+.wa{font-size:14px;color:var(--ink-soft)}
+.hwlog{width:100%;display:grid;gap:8px}
+.hwlog h3{font-size:16px;color:var(--ink-soft)}
+.hwrow{display:flex;gap:10px;flex-wrap:wrap}
+.hwrow figure{margin:0;display:grid;gap:4px;justify-items:center;text-align:center}
+.hwrow svg{width:96px;height:96px;border:1.5px solid var(--grid);border-radius:4px;background:var(--sheet)}
+.hwrow figure.solo svg{border-color:var(--accent);border-width:2.5px}
+.hwrow figcaption{font-size:12px;color:var(--ink-soft);line-height:1.4}
+.hwrow figcaption b{color:var(--ink)}
+.hwempty{margin:0;font-size:14px;color:var(--ink-soft)}
+.dadwrap{text-align:center;margin-top:28px}
+.dadbtn{font-size:14px;color:var(--ink-soft);padding:8px 16px;border:1px dashed var(--grid);border-radius:10px}
+.dadbox{width:min(100%,520px)}
+.pindots{display:flex;gap:16px;justify-content:center;margin:4px 0}
+.pindots i{width:18px;height:18px;border-radius:50%;border:2px solid var(--accent)}
+.pindots i.on{background:var(--accent)}
+.pindots.shake{animation:shake .35s}
+.pinmsg{min-height:22px;text-align:center;color:var(--stamp);margin:0;font-size:14px}
+.pinpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;width:min(100%,300px);margin:0 auto}
+.pinpad button{height:64px;border-radius:16px;background:var(--paper);font-family:var(--f-display);font-size:28px;font-variant-numeric:tabular-nums}
+.pinpad button:active{background:var(--line)}
+.dadsec{display:grid;gap:8px;padding-top:14px;margin-top:6px;border-top:1px solid var(--line)}
+.dadsec h4{margin:0;font-family:var(--f-display);font-weight:400;font-size:19px}
+.dadsec p{margin:0;font-size:14px;color:var(--ink-soft)}
+.dadrow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px dashed var(--line)}
+.dadrow b{font-family:var(--f-display);font-weight:400;color:var(--accent);width:56px;flex:none}
+.dadrow span{flex:1;min-width:0;font-size:14px;color:var(--ink-soft)}
+.dadrow button{font-size:14px;padding:7px 12px;border-radius:8px;border:1.5px solid var(--stamp);color:var(--stamp);flex:none}
+.btn.warnbtn{background:var(--stamp);color:#fff;justify-self:start;min-height:46px;font-size:17px}
+.dadnote{margin:0;padding:10px 12px;border-radius:10px;background:#E5F4EB;color:var(--leaf);font-weight:700}
+/* 학습 계획 모달 */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(31,43,55,.45);display:grid;place-items:center;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));animation:fade .2s both}
+.mbox{background:var(--sheet);border-radius:20px;width:min(100%,480px);max-height:100%;overflow:auto;padding:22px;display:grid;gap:8px;box-shadow:0 20px 50px rgba(31,43,55,.25);animation:pop .25s cubic-bezier(.2,1.3,.5,1) both}
+.mhead{display:flex;align-items:center}
+.mhead h3{font-size:24px;margin-right:auto}
+.mclose{width:44px;height:44px;border-radius:50%;background:var(--paper);font-size:18px}
+.msub{margin:0 0 6px;color:var(--ink-soft);font-size:15px}
+.mlist{display:grid;gap:6px}
+.mbox{width:min(100%,600px)}
+.mlist{gap:10px}
+.pcard{display:grid;gap:6px;text-align:left;padding:14px 16px;border:1.5px solid var(--line);border-radius:14px;width:100%;background:var(--sheet)}
+.pcard.now{border-color:var(--accent);box-shadow:0 0 0 1.5px var(--accent) inset}
+.ph{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ph b{font-family:var(--f-display);font-weight:400;font-size:18px;color:var(--accent)}
+.ph strong{font-family:var(--f-display);font-weight:400;font-size:18px;margin-right:auto}
+.pstate{font-size:12px;padding:3px 9px;border-radius:99px;background:var(--paper);color:var(--ink-soft);font-weight:700}
+.pstate.done{background:#E5F4EB;color:var(--leaf)}
+.pcard{position:relative}
+.pcard.done{background:#F2F9F4;border-color:#BFE0CB}
+.pcard.done .ph b{color:var(--leaf)}
+.pstamp{position:absolute;right:14px;top:50%;width:64px;height:64px;margin-top:-32px;border-radius:50%;border:3px solid var(--stamp);color:var(--stamp);display:grid;place-items:center;font-family:var(--f-display);font-size:18px;transform:rotate(-12deg);background:rgba(255,255,255,.7)}
+.pcard.done .ph,.pcard.done .pl,.pcard.done .pmeta{padding-right:76px}
+.pbar{height:6px;border-radius:99px;background:var(--paper);overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--accent);border-radius:99px}
+.msum{font-family:var(--f-display);font-size:17px;color:var(--ink-soft)}
+.msum b{font-weight:400;color:var(--leaf);font-size:22px}
+.pstate.cur{background:var(--accent);color:#fff}
+.pl{display:flex;gap:10px;align-items:center;font-size:15px;flex-wrap:wrap}
+.pl .pn{font-size:12px;color:var(--ink-soft);padding:2px 8px;border-radius:6px;background:var(--paper)}
+.pl .hz{font-size:20px;letter-spacing:3px}
+.pl .hz i{font-style:normal}
+.pl .hz i.ok{color:var(--stamp)}
+.pmeta{font-size:13px;color:var(--ink-soft);line-height:1.5}
+@keyframes fade{from{opacity:0}}
+@keyframes pop{from{transform:translateY(16px) scale(.97);opacity:0}}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 24px;border-radius:14px;font-family:var(--f-display);font-size:20px;background:var(--accent-deep);color:#fff}
+.btn.alt{background:var(--sheet);color:var(--ink);border:1.5px solid var(--ink)}
+.btn.red{background:var(--accent)}
+.week{background:var(--paper);border-left:1px solid var(--line);padding:20px;display:grid;gap:6px;align-content:start}
+.week h3{font-size:17px;margin-bottom:4px}
+.week h3 small{font-family:var(--f-body);font-size:13px;color:var(--ink-soft);margin-left:6px}
+.day{display:grid;grid-template-columns:52px minmax(0,1fr) auto;gap:10px;align-items:center;padding:9px 10px;border-radius:10px;font-size:15px;text-align:left;width:100%}
+.day:hover{background:var(--sheet)}
+.day em{font-style:normal;font-size:12px;color:var(--leaf);font-weight:700}
+.today .chars span.ok{color:var(--stamp);border-color:var(--stamp);box-shadow:0 0 0 1.5px var(--stamp) inset}
+.day b{font-family:var(--f-display);font-weight:400;font-size:15px;color:var(--ink-soft)}
+.day.now{background:var(--sheet);box-shadow:0 0 0 2px var(--accent) inset}
+.day.now b{color:var(--accent)}
+.day.test b{color:var(--accent)}
+
+/* progress */
+.progress{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:16px 20px}
+.bar{flex:1 1 200px;height:14px;background:var(--paper);border-radius:99px;overflow:hidden;border:1px solid var(--line)}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s}
+.progress{display:grid;gap:14px}
+.phead{display:flex;align-items:center}
+.slots{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:8px}
+.slots span{aspect-ratio:1;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-size:clamp(16px,3vw,26px);color:#B4C3D4}
+.slots span.ok{border:2.5px solid var(--stamp);color:var(--stamp);transform:rotate(-6deg)}
+.cheerline{font-family:var(--f-display);font-size:18px;color:var(--accent)}
+.overall{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--ink-soft);border-top:1px solid var(--line);padding-top:12px}
+.overall .bar{height:8px}
+.progress .num{font-family:var(--f-display);font-size:22px;font-variant-numeric:tabular-nums}
+.examinfo{display:flex;gap:8px;flex-wrap:wrap}
+.examinfo span{font-size:13px;padding:4px 10px;border-radius:99px;background:var(--paper);color:var(--ink-soft)}
+
+/* lessons */
+.lessons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.lesson{padding:18px 20px;text-align:left;display:grid;grid-template-columns:minmax(0,1fr);gap:10px;position:relative;min-width:0}
+.lesson .n{font-size:13px;color:var(--ink-soft)}
+.lesson h3{font-size:18px}
+.lesson .row{display:grid;grid-template-columns:repeat(5,minmax(0,44px));gap:8px;min-width:0}
+.lesson .row span{aspect-ratio:1;min-width:0;display:grid;place-items:center;font-size:24px;line-height:1;border-radius:50%;position:relative}
+.lesson .row span.ok{color:var(--stamp);box-shadow:0 0 0 2px var(--stamp) inset}
+.lesson.locked{opacity:.5}
+.lesson.locked::after{content:"잠김";position:absolute;top:12px;right:12px;font-size:12px;color:var(--ink-soft)}
+
+/* play */
+.plays{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.play.exam{grid-column:1/-1}
+.play{padding:18px 20px;text-align:left;display:grid;gap:6px}
+.play .ex{font-size:26px;height:40px;display:flex;align-items:center;gap:6px}
+.play .ex small{font-family:var(--f-body);font-size:15px;color:var(--ink-soft);font-weight:400}
+.play h3{font-size:18px}
+.play p{margin:0;font-size:14px;color:var(--ink-soft);line-height:1.45}
+.play .tag{font-size:12px;color:var(--accent)}
+.play.exam{background:var(--accent-deep);color:#fff;border-color:var(--accent-deep)}
+.play.exam p{color:#C9D4DA}
+
+/* lesson view */
+.tabs{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.tabs .back{font-family:var(--f-display);font-size:17px;padding:8px 12px;border-radius:10px;background:var(--sheet);border:1px solid var(--line)}
+.tabs .ttl{font-family:var(--f-display);font-size:20px;margin-right:auto;margin-left:6px}
+.ctab{width:56px;height:56px;border-radius:12px;background:var(--sheet);border:1.5px solid var(--line);font-family:var(--f-han);font-weight:700;font-size:30px;position:relative}
+.ctab[aria-current="true"]{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent) inset}
+.ctab .dot{position:absolute;right:-5px;top:-5px;width:20px;height:20px;border-radius:50%;background:var(--stamp);color:#fff;font-size:11px;font-family:var(--f-body);display:grid;place-items:center;font-weight:700}
+.study{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-top:14px}
+.info{padding:22px;display:grid;gap:16px;align-content:start}
+.hero{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+.bigbox{width:150px;height:150px;flex:none;border:2px solid var(--grid);border-radius:6px;position:relative;display:grid;place-items:center;font-size:118px;line-height:1;background:
+  linear-gradient(var(--grid),var(--grid)) center/100% 1px no-repeat,
+  linear-gradient(var(--grid),var(--grid)) center/1px 100% no-repeat}
+.bigbox::before{content:"";position:absolute;inset:0;background:var(--sheet);opacity:.55}
+.bigbox span{position:relative;padding-bottom:10px}
+.hunum{display:grid;gap:6px}
+.hunum .hm{font-family:var(--f-display);font-size:40px;line-height:1.1}
+.hunum .hm em{font-style:normal;color:var(--stamp)}
+.hunum .sub{font-size:14px;color:var(--ink-soft)}
+.speak{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:999px;background:var(--paper);font-size:15px;font-family:var(--f-display);width:max-content}
+.speak svg{width:20px;height:20px}
+.story{background:var(--paper);border-radius:14px;padding:14px 16px;display:grid;gap:6px}
+.story h3{font-size:16px;color:var(--ink-soft)}
+.story p{margin:0;font-size:18px;line-height:1.65}
+.words{display:grid;gap:8px}
+.words h3{font-size:16px;color:var(--ink-soft)}
+.word{display:grid;grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:12px;text-align:left}
+.word .h{font-family:var(--f-han);font-weight:700;font-size:26px}
+.word .r{font-family:var(--f-display);font-size:20px}
+.word .m{font-size:14px;color:var(--ink-soft)}
+.word svg{width:20px;height:20px;color:var(--ink-soft)}
+
+.write{padding:18px;display:grid;gap:14px;justify-items:center;align-content:start}
+.modes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:min(100%,560px);background:var(--paper);padding:5px;border-radius:14px}
+.modes button{padding:10px 4px;border-radius:10px;font-family:var(--f-display);font-size:17px;color:var(--ink-soft);display:flex;align-items:center;justify-content:center;gap:6px}
+.modes button i{font-style:normal;width:22px;height:22px;border-radius:50%;background:var(--sheet);display:grid;place-items:center;font-size:13px}
+.modes button.done i{background:var(--leaf);color:#fff}
+.modes button[aria-current="true"]{background:var(--sheet);color:var(--ink);box-shadow:0 1px 3px rgba(31,43,55,.15)}
+.board{position:relative;width:min(100%,480px);aspect-ratio:1;max-width:100%;border:2.5px solid var(--grid);border-radius:6px;touch-action:none;background:var(--sheet)}
+.board .g{position:absolute;inset:0;width:100%;height:100%}
+.board .w{position:absolute;inset:0}
+.status{min-height:30px;font-family:var(--f-display);font-size:20px;text-align:center}
+.status.good{color:var(--leaf)}
+.status.oops{color:var(--stamp)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
+.actions .btn{min-height:46px;font-size:17px;padding:0 18px}
+.order{width:100%;display:grid;gap:8px}
+.order h3{font-size:16px;color:var(--ink-soft)}
+.strip{display:flex;flex-wrap:wrap;gap:6px}
+.strip figure{margin:0;display:grid;justify-items:center;gap:2px}
+.strip svg{width:54px;height:54px;border:1px solid var(--grid);border-radius:3px;background:var(--sheet)}
+.strip figcaption{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+
+.notebook{padding:18px;display:grid;gap:12px;margin-top:16px}
+.nb-head{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.nb-head h3{font-size:20px;margin-right:auto}
+.nb-head .hint{font-size:14px;color:var(--ink-soft);width:100%}
+.nbdone{font-family:var(--f-body);font-size:13px;font-weight:700;color:#fff;background:var(--leaf);padding:3px 10px;border-radius:99px;vertical-align:middle}
+.ctab .ndot{position:absolute;left:-5px;bottom:-5px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;display:grid;place-items:center}
+.nb-msg{min-height:26px;font-family:var(--f-display);font-size:18px;color:var(--accent);text-align:center}
+.nb-msg.warn{color:var(--stamp)}
+.chip{padding:8px 14px;border-radius:10px;border:1.5px solid var(--line);font-family:var(--f-display);font-size:16px;background:var(--sheet)}
+.chip.on{border-color:var(--sky);color:var(--sky)}
+.note{position:relative;width:100%;touch-action:none}
+.note canvas{position:absolute;inset:0;width:100%;height:100%}
+
+/* stamp */
+.stampfx{position:fixed;inset:0;display:grid;place-items:center;pointer-events:none;z-index:50}
+.stampfx div{width:220px;height:220px;border-radius:50%;border:8px solid var(--stamp);color:var(--stamp);display:grid;place-items:center;text-align:center;font-family:var(--f-display);font-size:38px;line-height:1.1;transform:rotate(-14deg);background:rgba(255,255,255,.85);animation:stamp .5s cubic-bezier(.2,1.6,.5,1) both}
+.stampfx div small{display:block;font-size:20px}
+@keyframes stamp{from{transform:rotate(-14deg) scale(2.4);opacity:0}to{transform:rotate(-14deg) scale(1);opacity:1}}
+
+/* quiz */
+.quiz{margin-top:14px;padding:24px;display:grid;gap:18px}
+.qtop{display:flex;align-items:center;gap:12px}
+.qtop .kind{font-family:var(--f-display);font-size:16px;padding:4px 12px;border-radius:99px;background:var(--paper)}
+.qtop .count{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+.dots{display:flex;gap:6px}
+.dots i{width:12px;height:12px;border-radius:50%;background:var(--line)}
+.dots i.o{background:var(--leaf)}
+.dots i.x{background:var(--stamp)}
+.dots i.c{background:var(--ink)}
+.qask{display:flex;gap:10px;align-items:center;flex-wrap:wrap;font-family:var(--f-display);font-size:22px}
+.qbody{display:grid;place-items:center;min-height:180px;text-align:center}
+.qbody .bigq{font-size:130px;line-height:1}
+.qbody .hq{font-family:var(--f-display);font-size:52px}
+.qbody .sent{font-size:26px;line-height:1.8}
+.qbody .sent u{font-family:var(--f-han);font-weight:700;font-size:36px;text-decoration:none;border-bottom:3px solid var(--accent);padding:0 4px}
+.qbody svg{width:190px;height:190px;border:2px solid var(--grid);border-radius:6px}
+.choices{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.choice{min-height:72px;border-radius:14px;border:2px solid var(--line);background:var(--sheet);font-family:var(--f-display);font-size:26px;display:flex;align-items:center;justify-content:center;gap:10px}
+.choice .no{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--ink-soft);font-size:15px;display:grid;place-items:center;color:var(--ink-soft);font-family:var(--f-body)}
+.choice.han{font-family:var(--f-han);font-weight:700;font-size:40px}
+.choice.right{border-color:var(--leaf);background:#E5F4EB}
+.choice.wrong{border-color:var(--stamp);background:#FBE7E4;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.feedback{min-height:28px;text-align:center;font-size:18px}
+.result{text-align:center;display:grid;gap:14px;justify-items:center;padding:20px 0}
+.result .score{font-family:var(--f-display);font-size:64px;line-height:1}
+
+.voiceset{padding:18px 20px;display:grid;grid-template-columns:auto minmax(0,1fr);gap:12px 16px;align-items:center}
+.voiceset label,.voiceset .lbl{font-family:var(--f-display);font-size:17px}
+.voiceset select{height:46px;border:1.5px solid var(--line);border-radius:10px;background:var(--sheet);color:var(--ink);font:inherit;font-size:16px;padding:0 10px;min-width:0;max-width:100%}
+.speeds{display:flex;gap:8px;flex-wrap:wrap}
+.voiceset .btn{grid-column:1/-1;justify-self:start;min-height:46px;font-size:17px}
+.voiceset .btn svg{width:20px;height:20px}
+.vtip{grid-column:1/-1;margin:0;font-size:14px;color:var(--ink-soft);line-height:1.6}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:#fff;padding:10px 18px;border-radius:12px;font-size:15px;z-index:60}
+
+@media (max-width:720px){
+  .lessons{grid-template-columns:minmax(0,1fr)}
+  .today{grid-template-columns:minmax(0,1fr)}
+  .week{border-left:0;border-top:1px solid var(--line)}
+}
+@media (max-width:480px){
+  .today .main{padding:22px 18px}
+  .today h2{font-size:30px}
+  .today .chars span{font-size:32px}
+  .bigbox{width:110px;height:110px;font-size:86px}
+  .hunum .hm{font-size:32px}
+  .choices{grid-template-columns:1fr}
+  .qbody .bigq{font-size:100px}
+  .modes button{font-size:15px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><div class="seal">漢</div><h1>아빠와 8급 한자 탐험</h1></div>
+        <nav class="nav" aria-label="화면">
+      <button id="nav-home" data-go="home">홈</button>
+      <button id="nav-lessons" data-go="lessons">학습</button>
+    </nav>
+  </header>
+  <main id="view"></main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.7.2/dist/hanzi-writer.min.js"></script>
+<script>
+const STROKES = {"人":{"strokes":["M 475 485 Q 547 653 563 683 Q 573 695 565 708 Q 558 721 519 742 Q 491 757 480 754 Q 462 750 465 730 Q 484 537 292 308 Q 280 296 269 284 Q 212 217 68 102 Q 58 92 66 89 Q 76 86 90 92 Q 190 138 274 210 Q 380 294 462 456 L 475 485 Z","M 462 456 Q 480 423 575 292 Q 666 171 733 101 Q 764 67 793 69 Q 881 75 958 79 Q 991 80 992 89 Q 993 98 956 112 Q 772 178 740 205 Q 617 304 490 466 Q 481 476 475 485 C 457 509 447 482 462 456 Z"],"medians":[[[483,736],[508,702],[511,678],[473,552],[408,416],[328,303],[271,244],[144,139],[72,95]],[[474,477],[477,459],[490,439],[571,333],[691,200],[753,145],[798,119],[986,90]]]},"三":{"strokes":["M 326 667 Q 283 663 312 640 Q 369 610 428 623 Q 543 641 665 661 Q 720 671 729 678 Q 739 688 735 698 Q 728 711 693 722 Q 660 731 561 701 Q 420 673 326 667 Z","M 329 421 Q 304 417 332 392 Q 348 379 385 383 Q 557 405 685 416 Q 721 420 709 440 Q 694 462 657 472 Q 621 479 558 466 Q 435 441 329 421 Z","M 130 165 Q 102 162 122 139 Q 140 120 163 113 Q 191 104 212 110 Q 515 179 929 157 Q 930 158 933 157 Q 960 156 967 167 Q 974 183 953 201 Q 884 255 835 246 Q 643 210 130 165 Z"],"medians":[[[316,655],[367,645],[416,648],[660,692],[722,692]],[[331,407],[375,405],[628,443],[657,443],[700,432]],[[127,152],[158,142],[195,139],[500,178],[846,204],[881,200],[955,174]]]},"二":{"strokes":["M 308 603 Q 260 597 293 574 Q 339 544 436 558 Q 551 576 673 596 Q 731 608 741 615 Q 753 625 747 636 Q 738 652 702 663 Q 669 672 559 641 Q 424 610 308 603 Z","M 517 212 Q 569 213 620 219 Q 756 229 896 214 Q 921 210 929 220 Q 938 235 924 248 Q 891 279 842 302 Q 826 309 797 301 Q 728 286 481 261 Q 172 236 155 234 Q 142 234 128 234 Q 113 234 111 221 Q 110 208 131 191 Q 150 176 185 163 Q 197 159 217 167 Q 233 173 306 183 Q 400 202 517 212 Z"],"medians":[[[293,587],[386,581],[688,633],[733,629]],[[126,219],[195,200],[469,236],[823,263],[916,230]]]},"月":{"strokes":["M 398 390 Q 410 502 412 535 L 414 566 Q 417 717 420 735 C 422 758 422 758 405 766 Q 405 767 404 767 Q 353 791 337 787 Q 316 783 334 760 Q 373 697 357 455 Q 353 356 304 239 Q 271 154 155 37 Q 140 24 137 16 Q 136 9 148 10 Q 164 11 186 26 Q 246 69 281 112 Q 333 173 363 244 Q 382 296 394 361 L 398 390 Z","M 420 735 Q 429 735 609 769 Q 631 773 637 762 Q 656 713 657 390 Q 657 128 640 101 Q 634 94 612 99 Q 581 105 549 111 Q 527 117 528 107 Q 595 55 633 16 Q 649 -3 665 -9 Q 675 -13 685 -2 Q 730 53 725 113 Q 712 321 709 657 Q 708 721 723 750 Q 736 772 723 783 Q 698 804 658 820 Q 639 827 621 820 Q 569 793 536 785 Q 493 773 405 766 C 375 763 390 730 420 735 Z","M 412 535 Q 442 529 533 542 Q 587 551 594 554 Q 603 561 599 569 Q 592 579 566 587 Q 538 594 511 583 Q 487 576 462 572 Q 440 568 414 566 C 384 564 382 540 412 535 Z","M 394 361 Q 428 351 561 374 Q 564 375 568 375 Q 590 379 594 382 Q 603 389 599 397 Q 592 407 566 415 Q 538 421 511 411 Q 484 404 456 397 Q 428 393 398 390 C 368 387 365 368 394 361 Z"],"medians":[[[339,773],[379,742],[387,685],[385,504],[366,342],[341,259],[296,169],[236,93],[184,43],[145,17]],[[415,764],[429,752],[503,762],[634,796],[666,780],[681,758],[687,291],[683,93],[664,56],[632,63],[538,104]],[[417,542],[430,550],[535,566],[588,564]],[[399,368],[413,375],[535,394],[588,392]]]},"王":{"strokes":["M 528 646 Q 601 659 678 670 Q 739 680 749 689 Q 761 698 755 709 Q 748 725 711 735 Q 672 745 579 716 Q 444 685 307 677 Q 261 673 293 649 Q 341 621 432 632 Q 450 635 472 638 L 528 646 Z","M 539 380 Q 707 411 713 416 Q 723 425 719 434 Q 712 447 679 458 Q 645 465 610 453 Q 576 443 541 434 L 490 423 Q 421 410 341 405 Q 299 401 328 380 Q 373 355 455 367 Q 471 370 489 372 L 539 380 Z","M 533 159 Q 536 277 539 380 L 541 434 Q 542 548 548 600 Q 557 627 529 645 L 528 646 C 505 665 463 666 472 638 Q 487 602 491 498 Q 490 468 490 423 L 489 372 Q 488 285 485 154 C 484 124 532 129 533 159 Z","M 520 106 Q 574 107 626 112 Q 776 124 907 105 Q 934 102 940 111 Q 950 127 936 140 Q 903 171 855 195 Q 839 202 810 193 Q 740 180 668 171 Q 587 165 533 159 L 485 154 Q 361 145 299 138 Q 229 128 125 130 Q 109 130 108 117 Q 107 104 127 87 Q 146 72 181 58 Q 193 54 213 62 Q 231 68 304 78 Q 401 97 520 106 Z"],"medians":[[[296,665],[329,657],[385,655],[675,704],[742,702]],[[331,394],[364,387],[424,387],[548,407],[647,431],[706,428]],[[479,636],[515,610],[516,575],[510,185],[490,163]],[[122,116],[158,100],[196,94],[403,122],[837,156],[926,123]]]},"日":{"strokes":["M 349 664 Q 348 665 347 666 Q 322 687 292 696 Q 282 697 274 689 Q 270 682 279 670 Q 331 531 294 261 Q 287 216 271 169 Q 262 141 267 118 Q 277 81 291 65 Q 304 50 314 66 Q 324 79 332 102 L 339 137 Q 349 186 350 238 Q 350 316 351 391 L 352 420 Q 353 576 361 626 C 364 652 364 652 349 664 Z","M 608 120 Q 641 78 665 39 Q 675 18 688 19 Q 707 20 724 59 Q 745 104 740 157 Q 728 310 721 593 Q 720 629 738 654 Q 748 669 738 681 Q 716 703 656 730 Q 635 740 617 729 Q 512 684 349 664 C 319 660 332 620 361 626 Q 410 635 590 672 Q 624 679 640 666 Q 691 615 658 164 Q 657 163 657 159 Q 653 143 640 144 C 621 121 602 128 608 120 Z","M 351 391 Q 390 378 433 387 Q 493 399 554 411 Q 582 417 587 421 Q 596 428 591 437 Q 584 447 556 455 Q 531 461 450 435 Q 375 423 352 420 C 322 416 322 400 351 391 Z","M 332 102 Q 345 98 361 100 Q 440 115 608 120 C 638 121 661 122 640 144 Q 633 153 614 166 Q 596 178 561 170 Q 438 146 339 137 C 309 134 303 108 332 102 Z"],"medians":[[[284,684],[321,646],[328,617],[332,516],[323,261],[302,136],[302,70]],[[359,660],[374,648],[388,650],[635,703],[668,687],[690,665],[699,450],[699,159],[685,105],[688,37]],[[357,413],[369,404],[398,404],[534,432],[581,431]],[[340,106],[355,119],[432,130],[585,147],[632,143]]]},"五":{"strokes":["M 499 673 Q 590 688 686 701 Q 750 711 761 720 Q 771 729 767 738 Q 760 753 727 762 Q 693 772 598 744 Q 453 713 314 705 Q 272 701 301 680 Q 340 653 430 664 Q 440 665 452 667 L 499 673 Z","M 482 468 Q 494 520 507 568 Q 525 635 524 641 Q 512 660 499 673 C 479 695 448 697 452 667 Q 461 625 443 526 Q 436 499 428 460 L 419 421 Q 395 322 357 159 C 350 130 401 136 408 165 Q 442 307 472 429 L 482 468 Z","M 641 177 Q 678 360 738 416 Q 759 438 741 459 Q 722 475 661 505 Q 640 514 614 505 Q 545 481 482 468 L 428 460 Q 355 450 280 446 Q 261 446 262 434 Q 265 424 286 416 Q 314 401 357 413 Q 388 417 419 421 L 472 429 Q 527 439 584 446 Q 614 452 625 440 Q 643 421 637 384 Q 615 266 585 174 C 576 145 635 148 641 177 Z","M 357 159 Q 329 158 301 152 Q 159 130 72 134 Q 62 135 53 128 Q 46 121 52 110 Q 64 94 119 62 Q 134 55 156 64 Q 339 130 526 140 Q 670 152 937 99 Q 943 99 949 97 Q 970 93 977 103 Q 984 115 964 132 Q 883 199 844 191 Q 840 191 837 189 Q 807 183 641 177 L 585 174 Q 521 178 408 165 L 357 159 Z"],"medians":[[[304,694],[343,685],[400,686],[704,735],[753,733]],[[460,663],[489,633],[483,587],[391,195],[375,174],[362,168]],[[273,435],[308,428],[345,430],[616,476],[654,467],[685,434],[619,200],[592,179]],[[63,118],[138,97],[419,149],[654,161],[855,153],[905,138],[966,110]]]},"南":{"strokes":["M 505 630 Q 571 643 640 654 Q 694 664 702 671 Q 711 678 707 688 Q 700 700 670 709 Q 643 715 517 679 L 459 667 Q 395 658 323 653 Q 286 649 312 630 Q 351 605 424 618 Q 436 621 452 621 L 505 630 Z","M 472 500 Q 488 567 505 630 L 517 679 Q 520 698 557 796 Q 563 806 545 824 Q 514 849 491 858 Q 475 864 466 857 Q 457 851 462 834 Q 478 801 475 781 Q 468 726 459 667 L 452 621 Q 440 560 428 494 C 423 464 465 471 472 500 Z","M 199 459 Q 184 474 160 478 Q 154 482 149 474 Q 145 467 148 454 Q 176 399 178 354 Q 182 248 168 130 Q 164 105 173 84 Q 186 62 204 49 Q 219 39 221 51 Q 228 55 231 78 Q 238 103 231 193 Q 224 349 228 405 Q 229 415 229 424 C 229 435 222 440 199 459 Z","M 594 474 Q 661 480 775 484 Q 793 484 799 475 Q 809 468 809 421 Q 812 228 785 117 Q 776 78 743 83 Q 706 90 673 95 Q 658 101 658 93 Q 657 86 669 73 Q 745 12 765 -21 Q 775 -37 787 -35 Q 803 -34 818 -4 Q 857 65 870 256 Q 879 443 892 465 Q 911 487 896 493 Q 880 511 840 529 Q 815 545 788 535 Q 752 525 660 518 Q 555 511 472 500 L 428 494 Q 398 491 372 486 Q 284 470 199 459 C 169 455 200 417 229 424 Q 322 452 558 471 L 594 474 Z","M 360 402 Q 381 356 400 343 Q 410 337 420 346 Q 427 353 429 367 Q 426 398 377 428 Q 367 435 358 434 Q 354 434 353 424 Q 352 415 360 402 Z","M 545 338 Q 608 420 613 426 Q 626 436 620 445 Q 613 458 594 474 C 571 494 554 501 558 471 Q 564 449 523 353 Q 516 341 513 331 C 503 303 527 314 545 338 Z","M 499 292 Q 514 296 648 312 Q 657 311 665 322 Q 666 332 647 341 Q 610 359 548 339 Q 547 339 545 338 L 513 331 Q 468 325 344 308 Q 319 307 338 291 Q 368 270 393 275 Q 417 281 447 283 L 499 292 Z","M 511 189 Q 548 193 679 194 Q 695 194 698 201 Q 702 210 690 221 Q 644 255 589 239 Q 555 233 513 224 L 457 216 Q 390 207 318 198 Q 302 197 313 182 Q 337 161 379 170 Q 413 179 458 184 L 511 189 Z","M 466 44 Q 470 23 475 15 Q 479 8 486 11 Q 493 14 497 26 Q 506 56 511 189 L 513 224 Q 513 239 519 263 Q 522 278 510 286 Q 504 290 499 292 C 472 306 437 311 447 283 Q 453 273 457 216 L 458 184 Q 464 57 466 44 Z"],"medians":[[[315,643],[356,635],[410,638],[652,683],[695,682]],[[476,844],[515,796],[455,519],[435,500]],[[158,467],[185,437],[198,410],[204,299],[200,119],[212,53]],[[207,456],[235,445],[467,482],[779,508],[808,508],[832,493],[848,471],[841,296],[832,186],[813,88],[782,39],[685,76],[666,91]],[[362,426],[404,373],[408,356]],[[564,468],[585,438],[537,350],[518,335]],[[339,300],[385,294],[577,326],[655,324]],[[316,190],[368,186],[615,219],[661,215],[689,206]],[[454,282],[485,258],[483,21]]]},"小":{"strokes":["M 499 695 Q 503 661 501 132 Q 500 110 488 101 Q 478 92 448 100 Q 414 107 383 113 Q 347 123 351 112 Q 352 105 375 91 Q 456 42 479 10 Q 504 -26 523 -25 Q 538 -26 552 11 Q 568 57 564 133 Q 531 583 572 723 Q 590 754 532 778 Q 498 797 477 789 Q 459 782 475 759 Q 497 731 499 695 Z","M 266 475 Q 223 408 170 349 Q 160 339 155 320 Q 148 292 154 273 Q 158 251 185 261 Q 213 274 237 308 Q 273 357 284 404 Q 297 441 293 470 Q 289 480 283 484 Q 273 484 266 475 Z","M 706 472 Q 769 411 842 323 Q 860 299 878 293 Q 888 292 897 303 Q 913 318 900 370 Q 887 431 709 508 Q 699 515 696 500 Q 695 484 706 472 Z"],"medians":[[[484,773],[501,765],[533,730],[525,545],[532,191],[528,90],[510,54],[459,68],[358,112]],[[280,476],[254,405],[170,274]],[[709,494],[800,425],[848,380],[866,353],[879,311]]]},"寸":{"strokes":["M 639 526 Q 756 544 901 531 Q 925 530 931 538 Q 938 551 926 564 Q 895 592 849 612 Q 833 618 807 608 Q 740 592 670 581 Q 654 580 640 576 L 586 569 Q 211 521 157 518 Q 150 519 144 518 Q 129 517 129 505 Q 128 492 148 478 Q 166 465 199 454 Q 209 450 229 459 Q 271 474 414 499 Q 498 515 586 520 L 639 526 Z","M 586 520 Q 587 372 588 117 Q 587 93 575 84 Q 565 75 537 82 Q 506 88 476 93 Q 439 103 443 92 Q 444 85 468 70 Q 547 19 568 -12 Q 593 -49 611 -48 Q 627 -49 641 -11 Q 657 38 653 117 Q 638 322 639 526 L 640 576 Q 640 687 658 753 Q 677 786 616 810 Q 579 829 559 821 Q 540 814 557 789 Q 581 761 583 724 Q 584 708 586 569 L 586 520 Z","M 342 367 Q 369 336 397 299 Q 410 283 428 280 Q 441 279 448 293 Q 457 309 451 344 Q 448 368 416 389 Q 382 407 345 423 Q 329 429 320 427 Q 314 424 314 409 Q 315 396 342 367 Z"],"medians":[[[142,505],[155,497],[207,488],[477,534],[834,575],[919,547]],[[562,808],[584,796],[618,763],[612,466],[619,91],[597,36],[552,48],[450,92]],[[325,418],[408,347],[429,300]]]},"水":{"strokes":["M 535 506 Q 538 699 560 762 Q 578 793 520 817 Q 486 836 465 830 Q 447 823 463 799 Q 485 771 486 736 Q 490 697 478 121 Q 477 97 463 88 Q 454 81 432 88 Q 407 94 382 99 Q 348 111 351 100 Q 352 93 373 78 Q 440 24 457 -5 Q 476 -41 493 -42 Q 508 -43 524 -7 Q 543 41 541 117 Q 531 294 534 470 L 535 506 Z","M 154 501 Q 141 501 139 492 Q 138 485 153 477 Q 199 452 227 461 Q 333 489 343 489 Q 359 486 347 456 Q 296 326 249 262 Q 201 190 114 119 Q 99 106 110 103 Q 120 102 141 113 Q 217 153 281 224 Q 342 288 419 454 Q 429 478 441 489 Q 456 501 447 511 Q 437 524 399 537 Q 378 549 336 530 Q 270 509 154 501 Z","M 590 446 Q 630 476 766 584 Q 787 603 814 615 Q 838 627 825 647 Q 809 666 779 681 Q 752 696 738 692 Q 723 691 729 675 Q 735 639 659 553 Q 620 508 577 459 C 557 436 566 428 590 446 Z","M 577 459 Q 555 484 535 506 C 515 528 516 494 534 470 Q 756 161 817 160 Q 898 169 967 175 Q 995 178 996 185 Q 997 192 964 205 Q 810 253 753 295 Q 690 346 590 446 L 577 459 Z"],"medians":[[[473,814],[500,795],[521,770],[508,455],[507,91],[485,42],[442,56],[371,91],[369,98],[358,98]],[[147,491],[209,482],[354,512],[381,505],[392,495],[384,459],[353,387],[280,261],[187,160],[113,110]],[[737,682],[750,671],[766,637],[721,583],[591,461],[590,452]],[[539,500],[550,465],[618,387],[729,271],[782,229],[820,207],[990,185]]]},"東":{"strokes":["M 520 680 Q 572 690 629 699 Q 675 709 682 715 Q 692 722 687 732 Q 680 744 650 752 Q 619 759 588 748 L 526 730 L 469 717 Q 411 707 343 701 Q 306 697 332 678 Q 366 654 444 668 Q 456 671 471 671 L 520 680 Z","M 274 565 Q 237 571 233 563 Q 227 556 238 539 Q 275 476 306 371 Q 312 338 333 319 Q 355 297 359 315 Q 360 322 361 330 L 358 361 Q 357 373 353 385 Q 325 488 316 524 C 309 553 304 561 274 565 Z","M 641 359 Q 641 353 644 346 Q 650 328 664 329 Q 680 330 689 347 Q 702 363 729 445 Q 748 503 790 535 Q 812 553 794 571 Q 775 590 719 621 Q 700 633 632 615 Q 581 612 517 598 L 472 591 Q 444 587 418 581 Q 307 562 274 565 C 244 565 286 519 316 524 Q 323 523 330 525 Q 382 543 473 556 L 517 563 Q 659 584 682 573 Q 692 567 685 533 Q 660 416 648 387 L 641 359 Z","M 517 450 Q 557 457 594 460 Q 616 463 609 476 Q 599 491 573 496 Q 552 500 517 491 L 473 480 Q 430 470 392 461 Q 376 457 395 442 Q 404 435 425 438 Q 449 442 472 444 L 517 450 Z","M 517 349 Q 571 355 641 359 C 671 361 672 369 648 387 Q 624 411 526 386 Q 522 386 517 384 L 470 376 Q 410 367 358 361 C 328 358 331 331 361 330 Q 370 329 380 331 Q 404 337 437 340 L 517 349 Z","M 517 330 Q 517 340 517 349 L 517 384 Q 517 415 517 450 L 517 491 Q 517 525 517 563 L 517 598 Q 517 599 518 602 Q 518 644 520 680 L 526 730 Q 530 761 538 787 Q 547 803 544 818 Q 537 828 476 864 Q 451 883 429 865 Q 423 861 430 843 Q 469 786 469 717 L 471 671 Q 471 634 472 591 L 473 556 Q 473 519 473 480 L 472 444 Q 471 411 470 376 L 470 295 Q 470 147 444 52 Q 432 13 461 -57 Q 468 -76 477 -79 Q 484 -86 491 -77 Q 500 -73 511 -50 Q 521 -23 519 11 Q 518 51 517 291 L 517 330 Z","M 437 340 Q 431 318 410 288 Q 352 206 286 150 Q 231 99 118 28 Q 102 16 117 14 Q 127 11 166 27 Q 227 48 284 89 Q 404 180 462 282 Q 466 289 470 295 C 506 353 453 384 437 340 Z","M 517 291 Q 614 173 722 63 Q 747 38 790 34 Q 868 28 949 42 Q 970 43 972 49 Q 975 56 958 64 Q 751 148 721 167 Q 663 206 529 319 Q 522 326 517 330 C 495 350 498 314 517 291 Z"],"medians":[[[335,691],[362,684],[399,684],[473,694],[615,726],[676,726]],[[241,557],[263,543],[288,509],[346,320]],[[286,561],[329,546],[601,594],[667,600],[704,595],[737,553],[711,493],[664,349]],[[394,452],[447,456],[544,476],[598,471]],[[366,338],[380,348],[639,382]],[[444,855],[471,834],[498,801],[494,205],[479,31],[482,-64]],[[465,338],[408,243],[328,155],[291,122],[205,62],[121,21]],[[523,319],[533,294],[599,230],[700,137],[759,95],[815,76],[965,51]]]},"年":{"strokes":["M 383 704 Q 387 722 447 795 Q 457 808 443 824 Q 401 861 373 859 Q 360 856 362 841 Q 371 739 255 617 Q 239 610 206 569 Q 196 553 213 557 Q 232 560 258 578 Q 328 629 374 691 L 383 704 Z","M 540 678 Q 732 714 742 721 Q 752 730 747 739 Q 740 752 708 761 Q 681 767 571 735 Q 480 714 395 707 Q 386 706 383 704 C 359 698 359 698 374 691 Q 425 666 459 665 Q 469 666 483 668 L 540 678 Z","M 569 502 Q 576 505 723 521 Q 735 520 744 532 Q 745 545 722 556 Q 683 580 599 554 Q 584 553 570 547 L 513 535 Q 455 525 402 520 Q 371 519 338 513 C 308 508 334 461 363 467 Q 430 480 513 494 L 569 502 Z","M 338 513 Q 320 523 301 529 Q 288 533 278 527 Q 271 521 278 506 Q 294 481 303 453 Q 310 426 326 323 C 331 293 371 296 368 326 Q 362 386 363 467 C 363 497 363 500 338 513 Z","M 566 300 Q 683 327 910 303 Q 935 299 941 308 Q 950 321 937 335 Q 864 401 799 379 Q 699 361 566 347 L 511 341 Q 426 337 368 326 L 326 323 Q 295 322 272 317 Q 197 307 86 306 Q 71 306 70 294 Q 69 281 88 266 Q 133 233 171 245 Q 190 252 265 263 Q 421 296 510 297 L 566 300 Z","M 508 -43 Q 514 -71 521 -81 Q 527 -88 535 -86 Q 550 -77 559 -12 Q 569 78 567 166 Q 566 205 566 300 L 566 347 Q 566 414 569 502 L 570 547 Q 571 580 583 630 Q 587 649 571 659 Q 553 672 540 678 C 514 693 469 694 483 668 Q 483 664 499 640 Q 512 613 513 535 L 513 494 Q 512 425 511 341 L 510 297 Q 498 66 508 -43 Z"],"medians":[[[375,845],[402,804],[358,712],[298,635],[267,604],[216,567]],[[385,693],[473,691],[689,735],[735,733]],[[345,510],[379,494],[665,542],[733,534]],[[287,518],[318,492],[328,470],[342,358],[346,345],[361,332]],[[83,293],[109,281],[158,275],[451,316],[815,347],[872,341],[929,318]],[[490,668],[536,641],[544,630],[531,-76]]]},"四":{"strokes":["M 181 600 Q 160 612 138 618 Q 131 621 125 615 Q 115 608 127 596 Q 187 488 192 250 Q 193 186 231 153 Q 234 150 239 147 Q 258 141 260 176 Q 260 179 260 181 L 256 222 Q 255 237 233 382 Q 223 476 218 552 C 216 582 208 586 181 600 Z","M 717 200 Q 732 151 739 143 Q 746 131 756 132 Q 768 133 780 152 Q 822 206 870 461 Q 880 527 903 564 Q 916 579 914 589 Q 915 605 874 643 Q 825 691 790 679 Q 784 679 778 677 Q 756 673 680 666 Q 451 647 302 616 Q 220 604 181 600 C 151 597 189 543 218 552 Q 222 553 236 558 Q 294 576 370 589 L 410 596 Q 485 611 523 611 L 589 618 Q 686 630 773 631 Q 798 632 810 616 Q 825 603 823 571 Q 820 493 784 354 Q 759 245 748 231 Q 747 227 739 225 Q 733 226 726 230 C 709 223 709 223 717 200 Z","M 370 589 Q 391 546 349 422 Q 336 386 316 357 Q 306 341 296 326 Q 292 322 289 316 Q 286 307 295 308 Q 322 308 372 379 Q 408 436 424 507 Q 428 529 436 547 Q 443 559 439 570 Q 429 585 410 596 C 385 612 359 617 370 589 Z","M 523 611 Q 524 608 529 604 Q 545 585 545 536 Q 546 493 546 439 Q 545 384 570 366 Q 592 345 691 351 Q 725 352 735 368 Q 745 378 738 386 Q 731 393 634 397 Q 589 400 587 441 Q 581 502 605 588 Q 609 603 601 612 Q 597 616 589 618 C 562 631 504 634 523 611 Z","M 260 181 Q 270 180 283 180 Q 421 199 717 200 C 747 200 748 209 726 230 Q 693 269 620 252 Q 418 225 256 222 C 226 221 230 183 260 181 Z"],"medians":[[[132,606],[163,582],[189,529],[224,229],[244,159]],[[187,595],[227,581],[466,625],[712,650],[801,654],[833,638],[866,588],[816,348],[781,226],[760,193],[755,149]],[[377,587],[408,560],[387,462],[351,379],[298,316]],[[530,611],[571,584],[566,446],[579,393],[608,377],[638,373],[699,371],[732,379]],[[263,216],[285,201],[651,229],[697,224],[706,211]]]},"弟":{"strokes":["M 353 743 Q 381 719 412 691 Q 425 679 439 680 Q 449 680 453 693 Q 457 706 449 733 Q 443 752 412 767 Q 337 794 328 787 Q 324 783 325 771 Q 328 761 353 743 Z","M 614 808 Q 593 769 534 695 Q 524 677 542 681 Q 591 712 617 733 Q 695 790 701 793 Q 722 803 711 822 Q 696 838 669 852 Q 644 865 632 861 Q 619 860 624 846 Q 628 827 614 808 Z","M 712 522 Q 737 574 763 591 Q 784 613 758 631 Q 734 650 708 666 Q 695 678 641 659 Q 577 650 431 617 Q 365 604 323 600 Q 310 600 308 592 Q 305 586 327 574 Q 343 562 385 572 Q 445 587 483 595 L 520 601 Q 577 611 661 621 Q 674 622 679 616 Q 685 603 659 528 C 649 500 698 495 712 522 Z","M 542 463 Q 621 476 723 487 Q 735 488 736 498 Q 736 505 712 522 C 697 533 689 532 659 528 Q 656 529 654 528 Q 596 515 541 500 L 492 490 Q 393 471 306 457 C 276 452 288 419 318 422 Q 325 422 335 424 Q 396 440 493 455 L 542 463 Z","M 542 330 Q 608 342 697 352 Q 755 362 779 358 Q 794 357 800 344 Q 807 326 765 214 Q 759 196 741 200 Q 711 207 674 217 Q 644 226 665 198 Q 720 143 731 116 Q 738 101 753 103 Q 766 102 784 116 Q 808 141 832 201 Q 850 283 886 318 Q 905 339 892 353 Q 867 381 828 405 Q 812 417 752 401 Q 724 397 542 364 L 493 355 Q 405 340 350 325 Q 317 319 301 320 Q 292 321 295 338 Q 307 411 318 422 C 327 444 327 444 306 457 Q 290 470 268 480 Q 256 489 246 480 Q 237 473 247 455 Q 260 427 251 388 Q 235 333 219 311 Q 207 293 219 276 Q 229 248 244 241 Q 254 235 279 254 Q 330 297 450 314 L 542 330 Z","M 491 275 Q 491 109 481 22 Q 478 -20 503 -53 Q 516 -68 525 -50 Q 543 -14 544 59 Q 543 86 542 330 L 542 364 Q 542 413 542 463 L 541 500 Q 541 561 544 570 Q 547 582 538 589 Q 531 595 520 601 C 495 617 479 625 483 595 Q 486 588 492 490 L 493 455 Q 493 406 493 355 L 491 275 Z","M 450 314 Q 444 295 426 269 Q 371 194 310 143 Q 259 97 155 32 Q 136 20 153 17 Q 190 14 294 72 Q 363 121 414 175 Q 421 184 491 275 C 531 326 472 370 450 314 Z"],"medians":[[[332,781],[405,738],[438,695]],[[631,852],[651,832],[660,812],[582,727],[537,688]],[[316,591],[338,585],[374,588],[520,620],[675,645],[699,638],[721,608],[695,552],[667,538]],[[314,453],[336,443],[657,504],[709,504],[727,497]],[[257,470],[276,449],[285,424],[262,322],[262,296],[290,294],[424,327],[768,383],[811,379],[827,365],[845,338],[798,205],[775,168],[760,157],[665,209]],[[489,594],[515,571],[519,316],[514,-48]],[[486,314],[414,213],[338,135],[274,84],[157,24]]]},"七":{"strokes":["M 433 375 Q 649 436 864 443 Q 889 443 895 453 Q 901 469 887 480 Q 812 531 750 510 Q 698 494 450 429 Q 441 428 434 424 L 387 414 Q 314 398 270 386 Q 204 367 103 353 Q 88 352 88 339 Q 89 326 111 313 Q 130 303 166 293 Q 179 290 196 301 Q 253 328 386 363 L 433 375 Z","M 386 363 Q 386 159 409 117 Q 445 69 575 64 Q 719 58 792 93 Q 805 102 804 113 Q 800 132 779 142 Q 749 157 729 154 Q 716 154 707 147 Q 680 125 543 118 Q 473 118 450 150 Q 426 189 433 375 L 434 424 Q 437 644 465 686 Q 481 714 452 734 Q 416 759 394 765 Q 363 772 354 758 Q 347 748 357 739 Q 391 705 388 630 Q 391 551 387 414 L 386 363 Z"],"medians":[[[101,340],[172,328],[492,417],[767,476],[820,476],[882,461]],[[364,750],[397,734],[424,701],[407,327],[414,194],[431,131],[477,103],[544,91],[658,97],[747,116],[784,112]]]},"萬":{"strokes":["M 436 747 Q 433 778 432 801 Q 433 820 413 826 Q 373 844 351 836 Q 333 826 349 808 Q 376 780 386 746 Q 386 745 387 742 L 398 706 Q 414 664 423 655 Q 436 645 441 657 Q 447 678 440 716 L 436 747 Z","M 440 716 Q 459 722 483 726 Q 498 727 515 736 Q 522 740 520 747 Q 519 753 506 756 Q 475 753 436 747 L 387 742 Q 326 736 253 726 Q 210 729 186 727 Q 176 728 174 724 Q 171 717 177 707 Q 190 692 217 680 Q 233 670 250 674 Q 322 690 398 706 L 440 716 Z","M 647 775 Q 654 791 668 812 Q 681 825 671 836 Q 661 852 628 868 Q 613 877 597 868 Q 587 864 594 852 Q 603 833 592 768 L 587 742 Q 569 664 570 661 Q 571 649 585 656 Q 598 668 628 730 L 647 775 Z","M 628 730 Q 644 729 666 733 Q 745 748 839 735 Q 854 734 858 742 Q 862 752 851 767 Q 809 806 718 786 Q 685 782 647 775 L 592 768 Q 588 769 582 768 Q 555 765 574 751 Q 581 747 587 742 L 628 730 Z","M 320 602 Q 304 609 288 613 Q 281 616 276 610 Q 269 604 279 593 Q 312 545 326 434 Q 330 374 368 348 Q 369 348 371 347 Q 387 343 387 368 L 386 394 Q 383 416 375 441 Q 360 547 360 564 Q 360 568 358 573 C 355 588 348 591 320 602 Z","M 610 397 Q 625 373 640 365 Q 650 356 667 378 Q 683 400 717 529 Q 727 560 752 584 Q 765 597 755 611 Q 739 629 697 657 Q 679 666 604 649 Q 550 643 441 623 Q 374 610 320 602 C 290 597 329 565 358 573 Q 397 585 453 594 L 499 602 Q 631 630 657 612 Q 670 602 665 582 Q 635 438 615 428 C 601 409 601 409 610 397 Z","M 524 489 Q 566 498 603 503 Q 625 507 617 520 Q 607 535 581 539 Q 559 540 525 531 L 473 515 Q 433 505 399 493 Q 383 489 403 475 Q 413 468 433 472 Q 452 476 474 480 L 524 489 Z","M 522 386 Q 567 393 610 397 C 640 400 643 418 615 428 Q 591 440 522 420 L 474 411 Q 428 404 386 394 C 357 387 357 367 387 368 Q 393 368 400 369 Q 437 376 474 379 L 522 386 Z","M 221 259 Q 211 269 188 274 Q 182 277 177 270 Q 173 263 177 249 Q 207 198 195 54 Q 191 29 201 7 Q 214 -15 232 -28 Q 247 -38 249 -25 Q 256 -21 259 2 Q 263 18 259 72 Q 259 93 258 212 C 258 231 245 241 221 259 Z","M 520 268 Q 626 283 754 285 Q 778 284 787 270 Q 796 260 790 244 Q 786 78 773 54 Q 769 44 754 47 Q 727 51 699 54 Q 665 58 689 36 Q 755 -24 781 -66 Q 791 -82 806 -71 Q 822 -55 833 -29 Q 846 -1 856 155 Q 859 213 879 241 Q 897 265 890 275 Q 881 290 823 329 Q 801 347 783 340 Q 749 327 687 319 Q 593 312 520 302 L 474 296 Q 389 289 344 277 Q 274 264 221 259 C 191 256 229 204 258 212 Q 268 213 276 216 Q 343 238 466 261 Q 469 262 474 262 L 520 268 Z","M 519 170 Q 519 222 520 268 L 520 302 Q 520 345 522 386 L 522 420 Q 523 456 524 489 L 525 531 Q 529 576 524 583 Q 512 593 499 602 C 475 620 438 620 453 594 Q 459 584 465 572 Q 471 554 473 515 L 474 480 Q 474 455 474 411 L 474 379 Q 474 343 474 296 L 474 262 Q 474 217 474 162 C 474 132 519 140 519 170 Z","M 605 186 Q 562 179 519 170 L 474 162 Q 428 156 380 147 Q 362 143 335 147 Q 322 147 320 138 Q 316 125 324 117 Q 343 99 373 78 Q 383 74 395 81 Q 425 100 589 155 Q 604 159 618 166 C 645 179 635 191 605 186 Z","M 618 166 Q 648 114 664 109 Q 674 108 681 117 Q 688 129 689 157 Q 686 188 611 232 Q 599 239 592 239 Q 588 236 585 225 Q 586 215 604 189 Q 604 188 605 186 L 618 166 Z"],"medians":[[[357,822],[380,812],[400,793],[432,660]],[[182,719],[209,707],[252,700],[511,744]],[[600,859],[615,852],[634,823],[579,662]],[[576,760],[634,751],[732,765],[793,766],[825,760],[847,748]],[[284,603],[307,586],[330,557],[355,412],[374,360]],[[328,599],[360,591],[619,638],[659,637],[684,628],[708,598],[686,539],[667,461],[644,405],[648,383]],[[401,484],[565,518],[607,514]],[[393,375],[400,383],[424,389],[594,414],[608,421]],[[186,263],[208,239],[227,198],[227,34],[240,-24]],[[228,255],[268,240],[449,277],[570,292],[794,308],[813,295],[838,259],[828,230],[818,99],[805,29],[791,4],[757,14],[690,47]],[[461,592],[497,567],[499,543],[497,189],[480,170]],[[332,134],[382,113],[586,170],[609,167]],[[594,229],[655,163],[667,122]]]},"室":{"strokes":["M 487 791 Q 514 769 543 741 Q 559 728 576 729 Q 588 730 593 744 Q 597 760 586 793 Q 574 823 480 843 Q 462 847 456 843 Q 450 839 453 825 Q 457 812 487 791 Z","M 285 639 Q 284 640 284 643 Q 274 667 262 676 Q 244 692 241 666 Q 245 636 202 582 Q 157 534 173 487 Q 174 478 179 471 Q 192 444 214 471 Q 233 496 249 537 Q 265 582 278 608 C 288 629 288 629 285 639 Z","M 278 608 Q 302 596 338 603 Q 449 637 696 660 Q 738 664 753 661 Q 769 649 767 641 Q 754 599 739 554 L 741 553 Q 748 549 765 561 Q 819 597 863 609 Q 899 619 898 628 Q 897 638 824 692 Q 802 710 729 697 Q 591 682 386 651 Q 335 644 285 639 C 255 636 249 617 278 608 Z","M 493 487 Q 680 523 686 526 Q 695 533 690 541 Q 684 551 658 560 Q 630 566 535 537 Q 405 516 369 513 Q 336 509 359 493 Q 389 474 441 478 L 493 487 Z","M 511 317 Q 557 330 623 343 Q 638 347 648 353 C 675 365 666 375 636 370 Q 530 354 415 325 Q 405 321 401 324 Q 400 327 405 333 Q 495 426 514 440 Q 527 447 522 461 Q 518 470 493 487 C 469 505 441 508 441 478 Q 447 439 392 377 Q 367 346 319 319 Q 306 309 308 299 Q 312 283 334 262 Q 343 250 356 260 Q 392 288 472 307 L 511 317 Z","M 648 353 Q 685 307 696 304 Q 706 303 713 313 Q 720 326 717 354 Q 714 384 628 430 Q 615 436 608 435 Q 604 432 602 420 Q 602 410 636 370 L 648 353 Z","M 537 170 Q 585 179 697 189 Q 707 188 716 199 Q 717 209 696 221 Q 666 243 587 220 Q 563 216 540 210 L 486 200 Q 441 196 321 183 Q 293 180 314 163 Q 341 139 386 147 Q 431 156 486 163 L 537 170 Z","M 531 53 Q 534 117 537 170 L 540 210 Q 546 286 542 292 Q 526 308 511 317 C 486 333 461 335 472 307 Q 482 289 486 200 L 486 163 Q 486 117 486 49 C 486 19 530 23 531 53 Z","M 524 5 Q 569 6 612 11 Q 742 20 846 5 Q 868 2 875 11 Q 882 24 871 36 Q 843 64 799 84 Q 790 87 649 65 Q 618 65 531 53 L 486 49 Q 386 42 335 35 Q 277 28 190 28 Q 177 29 175 17 Q 174 5 193 -10 Q 209 -23 240 -35 Q 250 -39 269 -31 Q 282 -27 345 -18 Q 424 -2 524 5 Z"],"medians":[[[463,835],[544,788],[574,748]],[[252,671],[261,641],[257,621],[205,524],[195,474]],[[288,614],[309,622],[503,654],[764,681],[801,662],[812,638],[754,564],[744,561]],[[361,504],[392,498],[444,500],[636,538],[682,535]],[[508,454],[473,449],[431,389],[391,348],[369,309],[404,305],[602,353],[630,358],[641,354]],[[612,429],[684,356],[699,315]],[[316,174],[350,166],[402,170],[639,208],[706,201]],[[479,306],[508,284],[514,245],[510,78],[493,57]],[[187,16],[220,2],[252,-3],[478,26],[780,48],[863,20]]]},"火":{"strokes":["M 226 483 Q 254 443 285 393 Q 295 375 312 372 Q 324 369 333 381 Q 342 396 342 430 Q 342 472 235 536 Q 220 543 213 543 Q 206 540 204 526 Q 205 513 226 483 Z","M 690 568 Q 677 547 584 441 Q 571 422 592 425 Q 638 449 738 513 Q 762 532 791 543 Q 816 553 805 575 Q 789 597 759 615 Q 731 633 715 629 Q 700 628 704 612 Q 708 590 690 568 Z","M 511 382 Q 520 439 529 618 Q 530 669 548 728 Q 554 741 543 750 Q 521 769 479 785 Q 454 795 434 789 Q 410 779 430 759 Q 464 725 465 690 Q 469 500 448 374 Q 427 209 284 106 Q 244 81 186 49 Q 170 43 167 39 Q 160 32 179 29 Q 197 28 258 48 Q 301 61 365 101 Q 414 131 442 172 Q 484 232 504 341 L 511 382 Z","M 504 341 Q 597 175 715 40 Q 740 9 767 9 Q 843 13 911 17 Q 939 18 940 25 Q 941 32 910 48 Q 753 117 709 157 Q 592 268 511 382 C 493 406 489 367 504 341 Z"],"medians":[[[216,534],[299,440],[316,391]],[[714,618],[736,593],[744,571],[696,522],[587,433]],[[436,773],[475,753],[497,733],[503,713],[488,443],[470,321],[456,275],[418,195],[368,138],[279,78],[174,36]],[[513,375],[521,341],[606,223],[689,127],[745,76],[768,60],[934,25]]]},"金":{"strokes":["M 527 731 Q 536 744 543 749 Q 553 755 551 767 Q 550 779 536 794 Q 499 831 460 827 Q 450 826 452 810 Q 462 702 278 504 Q 133 378 54 318 Q 44 312 56 308 Q 134 318 278 435 Q 378 525 510 708 L 527 731 Z","M 510 708 Q 613 572 746 429 Q 768 407 804 409 Q 925 416 963 424 Q 975 428 976 433 Q 976 439 960 447 Q 798 498 739 542 Q 642 620 527 731 C 505 752 492 732 510 708 Z","M 507 430 Q 651 463 654 465 Q 663 472 659 480 Q 652 492 624 500 Q 599 506 498 475 Q 410 454 334 448 Q 298 442 323 426 Q 362 402 419 415 Q 435 419 455 420 L 507 430 Z","M 526 270 Q 668 300 674 303 Q 683 310 679 320 Q 672 332 642 341 Q 618 347 527 321 L 470 307 Q 382 291 303 285 Q 266 281 292 262 Q 334 235 391 248 Q 428 255 470 261 L 526 270 Z","M 517 58 Q 521 175 526 270 L 527 321 Q 530 408 531 408 Q 530 411 529 411 Q 519 421 507 430 C 484 449 442 447 455 420 Q 470 401 470 307 L 470 261 Q 469 185 469 52 C 469 22 516 28 517 58 Z","M 283 157 Q 305 133 329 104 Q 342 89 359 88 Q 369 87 377 101 Q 383 116 377 148 Q 370 179 283 208 Q 267 212 260 211 Q 254 207 255 194 Q 258 182 283 157 Z","M 644 225 Q 623 198 556 134 Q 544 118 562 120 Q 583 129 680 177 Q 699 190 724 197 Q 746 204 738 223 Q 728 242 703 258 Q 681 274 669 273 Q 656 273 659 260 Q 660 241 644 225 Z","M 469 52 Q 336 39 179 24 Q 155 23 172 3 Q 187 -13 207 -19 Q 229 -26 248 -22 Q 489 35 803 15 Q 803 16 806 15 Q 828 14 834 24 Q 841 37 823 52 Q 766 97 724 89 Q 645 76 517 58 L 469 52 Z"],"medians":[[[463,815],[488,786],[495,764],[446,673],[357,553],[292,482],[237,433],[135,357],[60,314]],[[529,721],[529,708],[608,621],[722,509],[774,467],[790,458],[836,449],[967,432]],[[326,438],[346,432],[393,432],[596,476],[649,475]],[[295,275],[317,268],[365,267],[535,295],[630,318],[669,312]],[[462,420],[497,394],[500,335],[494,84],[474,61]],[[264,203],[341,143],[358,108]],[[667,264],[688,224],[562,128]],[[175,14],[230,2],[435,30],[734,54],[770,49],[821,31]]]},"中":{"strokes":["M 254 596 Q 244 603 202 608 Q 189 611 185 605 Q 178 598 189 580 Q 228 507 254 384 Q 260 347 282 324 Q 303 300 307 318 Q 310 328 310 343 L 306 381 Q 305 390 303 399 Q 276 513 267 556 C 261 585 259 594 254 596 Z","M 752 425 Q 765 462 777 498 Q 793 546 828 578 Q 853 603 821 624 Q 793 648 762 666 Q 743 679 717 668 Q 677 655 615 646 Q 575 642 535 636 L 476 628 Q 427 622 380 613 Q 307 603 254 596 C 224 592 237 551 267 556 Q 274 556 286 559 Q 400 587 476 593 L 534 600 Q 604 609 698 615 Q 717 616 724 607 Q 739 583 693 435 C 684 406 742 397 752 425 Z","M 530 370 Q 630 380 764 386 Q 776 387 778 397 Q 779 406 752 425 C 730 441 723 440 693 435 Q 606 420 530 407 L 475 399 Q 385 389 306 381 C 276 378 280 341 310 343 Q 314 343 321 343 Q 382 356 475 365 L 530 370 Z","M 475 365 Q 472 17 485 -11 Q 486 -12 488 -16 Q 503 -32 512 -10 Q 530 32 530 370 L 530 407 Q 531 519 534 600 L 535 636 Q 538 742 559 778 Q 566 794 545 811 Q 520 830 475 843 Q 454 847 441 833 Q 431 826 444 812 Q 472 787 475 753 Q 475 704 476 628 L 476 593 Q 476 517 476 419 Q 475 409 475 399 L 475 365 Z"],"medians":[[[194,598],[229,572],[236,553],[295,323]],[[262,591],[281,579],[471,611],[719,641],[741,638],[777,596],[732,460],[702,446]],[[316,350],[330,365],[689,409],[749,405],[768,398]],[[449,823],[476,817],[513,781],[505,656],[499,-10]]]},"女":{"strokes":["M 445 467 Q 485 576 514 665 Q 526 705 540 732 Q 562 757 524 789 Q 478 825 449 826 Q 433 827 429 815 Q 425 806 434 798 Q 455 774 453 731 Q 441 625 390 461 L 375 416 Q 348 338 337 327 Q 313 309 331 280 Q 340 270 356 274 Q 393 283 491 221 L 535 192 Q 637 132 757 11 Q 776 -8 789 -7 Q 805 -6 805 17 Q 804 54 773 100 Q 755 127 701 153 Q 599 213 569 230 L 519 256 Q 395 320 393 327 Q 393 333 427 423 L 445 467 Z","M 695 496 Q 656 544 628 541 Q 612 540 614 522 Q 618 504 617 486 L 606 440 Q 566 319 519 256 L 491 221 Q 406 128 277 81 Q 256 74 237 65 Q 221 59 233 53 Q 248 49 289 53 Q 356 63 413 95 Q 473 122 535 192 L 569 230 Q 600 275 659 395 Q 669 423 688 447 C 705 472 710 479 695 496 Z","M 688 447 Q 757 456 931 443 Q 956 440 962 449 Q 969 462 957 475 Q 926 503 881 524 Q 866 531 839 522 Q 767 507 695 496 L 617 486 Q 461 471 445 467 L 390 461 Q 314 454 268 447 Q 189 435 73 434 Q 60 434 57 422 Q 57 409 76 394 Q 94 381 126 369 Q 138 365 156 373 Q 205 392 375 416 L 427 423 Q 448 426 606 440 L 688 447 Z"],"medians":[[[442,810],[475,787],[498,746],[453,573],[373,346],[365,309],[498,244],[675,132],[740,81],[787,11]],[[628,527],[652,492],[651,462],[587,314],[549,249],[520,214],[452,148],[384,105],[321,78],[238,58]],[[70,420],[138,402],[383,440],[857,487],[913,474],[950,458]]]},"山":{"strokes":["M 536 209 Q 546 407 552 587 Q 556 633 562 664 Q 569 691 574 710 Q 578 723 554 740 Q 512 762 484 767 Q 465 771 456 760 Q 447 751 457 734 Q 488 688 489 655 Q 499 444 488 200 C 487 170 534 179 536 209 Z","M 796 244 Q 657 232 536 209 L 488 200 Q 379 182 284 155 Q 256 148 263 180 Q 267 253 272 329 Q 275 357 263 373 Q 220 416 190 409 Q 178 403 188 382 Q 224 309 215 236 Q 211 166 182 133 Q 161 112 170 96 Q 183 78 203 66 Q 219 57 230 67 Q 243 83 283 99 Q 440 151 606 182 Q 757 210 789 197 C 819 193 826 247 796 244 Z","M 789 197 Q 783 166 774 145 Q 756 118 785 55 Q 795 36 809 49 Q 837 73 846 173 Q 868 386 890 427 Q 900 443 889 460 Q 867 479 831 501 Q 816 510 802 503 Q 793 499 796 484 Q 823 435 796 244 L 789 197 Z"],"medians":[[[472,748],[525,700],[514,235],[493,208]],[[196,398],[217,379],[239,340],[243,263],[233,126],[282,127],[380,155],[575,197],[710,218],[772,221],[788,237]],[[810,490],[826,477],[849,433],[798,57]]]},"民":{"strokes":["M 628 625 Q 661 703 695 721 Q 714 742 698 762 Q 680 777 623 806 Q 604 815 579 806 Q 470 758 283 725 C 253 720 273 681 302 690 Q 306 691 314 694 Q 435 721 551 748 Q 581 757 593 744 Q 602 735 598 717 Q 586 672 573 634 C 564 606 616 598 628 625 Z","M 509 572 Q 566 582 639 589 Q 651 590 652 601 Q 652 608 628 625 L 573 634 Q 567 634 564 632 Q 414 592 293 574 C 263 569 264 549 293 541 Q 305 535 326 539 Q 375 552 456 564 L 509 572 Z","M 283 725 Q 261 744 242 753 Q 220 762 210 755 Q 198 748 208 730 Q 268 604 223 214 Q 219 157 171 101 Q 158 83 165 57 Q 177 26 191 12 Q 206 2 221 21 Q 243 57 439 197 Q 461 210 468 221 Q 472 231 461 233 Q 443 233 294 158 Q 276 151 276 167 Q 294 375 293 541 L 293 574 Q 293 580 293 585 Q 292 640 301 686 Q 301 689 302 690 C 305 708 305 708 283 725 Z","M 582 391 Q 631 406 687 420 Q 745 436 752 445 Q 762 455 756 463 Q 747 476 716 482 Q 683 486 652 472 Q 610 456 568 439 L 521 423 Q 517 423 516 422 Q 437 400 344 385 Q 305 376 335 359 Q 378 335 440 354 Q 488 367 538 379 L 582 391 Z","M 538 379 Q 616 193 752 69 Q 797 30 851 1 Q 914 -30 950 -32 Q 978 -28 969 8 Q 956 42 945 203 Q 944 216 938 217 Q 932 217 930 203 Q 918 164 909 126 Q 896 77 879 76 Q 857 75 807 108 Q 755 141 706 198 Q 621 294 582 391 L 568 439 Q 556 488 562 527 Q 565 549 520 568 Q 514 571 509 572 C 481 584 438 588 456 564 Q 457 561 459 556 Q 487 531 501 481 Q 510 451 521 423 L 538 379 Z"],"medians":[[[293,723],[304,714],[318,713],[571,776],[607,776],[645,741],[610,657],[581,639]],[[301,569],[311,558],[327,559],[574,608],[618,607],[642,600]],[[219,742],[250,710],[263,684],[268,463],[258,278],[245,169],[249,117],[304,131],[460,224]],[[336,373],[397,369],[539,403],[679,450],[745,456]],[[463,562],[506,543],[525,524],[534,467],[561,380],[621,267],[684,181],[778,88],[863,38],[909,32],[926,87],[940,209]]]},"白":{"strokes":["M 330 536 Q 397 597 434 638 Q 518 732 544 746 Q 569 764 552 783 Q 531 802 496 815 Q 463 828 448 821 Q 432 817 440 801 Q 452 762 384 658 Q 306 538 305 535 C 289 509 308 516 330 536 Z","M 227 531 Q 209 541 190 547 Q 183 550 176 543 Q 167 537 178 524 Q 236 419 241 179 Q 242 113 281 79 Q 282 78 287 75 Q 306 69 309 104 Q 309 111 309 117 L 304 156 Q 303 169 298 184 Q 292 239 283 310 Q 282 311 282 312 L 279 342 Q 272 421 270 485 C 269 510 254 517 227 531 Z","M 640 134 Q 650 106 675 51 Q 684 32 695 32 Q 713 35 724 63 Q 772 150 780 268 Q 792 341 801 428 Q 808 483 834 518 Q 855 540 840 556 Q 815 581 761 606 Q 740 618 702 605 Q 555 557 330 536 L 305 535 Q 268 535 227 531 C 197 529 241 478 270 485 Q 303 497 669 549 Q 712 556 729 536 Q 739 515 739 494 Q 732 337 696 185 Q 692 158 681 156 Q 677 155 664 160 C 635 153 633 152 640 134 Z","M 282 312 Q 297 305 324 308 Q 490 330 613 342 Q 643 345 633 362 Q 620 381 588 389 Q 558 396 505 384 Q 382 360 279 342 C 249 337 253 321 282 312 Z","M 309 117 Q 315 116 324 117 Q 426 133 640 134 C 670 134 685 139 664 160 Q 655 170 643 179 Q 625 192 590 186 Q 431 162 304 156 C 274 154 279 118 309 117 Z"],"medians":[[[449,809],[469,796],[487,761],[423,665],[330,549],[312,536]],[[184,534],[210,513],[236,471],[271,169],[292,88]],[[235,528],[277,511],[336,517],[550,547],[719,578],[742,574],[766,557],[784,536],[757,334],[727,160],[697,109],[695,47]],[[287,335],[300,327],[315,327],[570,365],[620,355]],[[311,150],[324,139],[337,138],[585,160],[655,161]]]},"大":{"strokes":["M 494 476 Q 542 485 795 501 Q 817 502 822 512 Q 826 525 808 540 Q 750 580 707 569 Q 631 550 500 522 L 436 509 Q 331 490 213 469 Q 189 465 208 447 Q 241 420 294 432 Q 357 453 431 465 L 494 476 Z","M 487 437 Q 491 456 494 476 L 500 522 Q 510 711 528 763 Q 534 776 523 786 Q 501 805 459 822 Q 434 832 414 825 Q 390 816 410 796 Q 444 762 444 726 Q 445 602 436 509 L 431 465 Q 398 275 310 179 Q 303 173 297 166 Q 251 118 148 55 Q 133 48 130 43 Q 124 36 144 34 Q 195 34 300 104 Q 385 173 414 218 Q 444 266 480 396 L 487 437 Z","M 480 396 Q 501 357 575 245 Q 657 124 718 56 Q 746 22 774 22 Q 856 28 928 32 Q 959 33 959 41 Q 960 50 927 66 Q 753 144 719 174 Q 614 267 500 419 Q 493 429 487 437 C 469 461 465 422 480 396 Z"],"medians":[[[210,458],[268,453],[514,503],[719,534],[770,529],[810,517]],[[416,810],[444,799],[482,759],[469,518],[448,394],[426,320],[386,231],[361,196],[307,140],[202,67],[138,41]],[[486,430],[500,393],[576,284],[660,182],[722,118],[774,77],[953,42]]]},"學":{"strokes":["M 287 710 Q 320 731 353 753 Q 366 766 385 774 Q 401 781 392 795 Q 382 808 362 818 Q 343 828 334 826 Q 324 825 328 815 Q 329 802 282 733 Q 278 729 275 723 C 260 697 262 694 287 710 Z","M 331 479 Q 321 522 314 558 L 309 581 Q 303 611 298 643 L 295 666 Q 292 703 287 710 L 275 723 Q 253 736 228 739 Q 215 742 208 735 Q 202 728 210 715 Q 234 684 248 648 Q 261 612 294 472 C 301 443 338 450 331 479 Z","M 298 643 Q 353 656 395 664 Q 413 668 405 678 Q 396 688 376 691 Q 345 691 295 666 C 268 653 269 636 298 643 Z","M 314 558 Q 365 567 402 575 Q 421 579 413 590 Q 403 600 382 603 Q 357 604 309 581 C 282 568 284 553 314 558 Z","M 525 767 Q 547 800 564 810 Q 570 816 568 825 Q 567 832 550 848 Q 534 861 522 862 Q 510 862 515 848 Q 521 835 490 781 L 475 759 Q 459 737 437 711 Q 431 705 429 701 Q 426 695 435 696 Q 453 696 499 742 L 525 767 Z","M 499 742 Q 554 699 564 696 Q 568 696 572 702 Q 578 709 567 732 Q 560 751 525 767 L 490 781 Q 459 794 439 800 Q 435 801 434 795 Q 434 791 475 759 L 499 742 Z","M 518 611 Q 537 638 548 646 Q 554 652 551 659 Q 550 666 534 680 Q 519 692 509 692 Q 499 691 502 679 Q 508 666 487 626 L 473 602 Q 472 601 470 597 Q 451 569 424 537 Q 418 533 417 528 Q 416 522 423 523 Q 438 526 496 585 L 518 611 Z","M 496 585 Q 544 543 552 540 Q 556 540 560 546 Q 566 553 557 577 Q 548 599 518 611 L 487 626 Q 454 641 435 647 Q 431 650 430 643 Q 430 636 436 630 Q 452 618 473 602 L 496 585 Z","M 729 538 Q 771 698 811 759 Q 821 769 819 780 Q 813 796 759 825 Q 744 834 730 830 Q 679 820 615 813 Q 596 813 603 801 Q 613 791 629 784 Q 641 780 709 791 Q 716 795 726 791 Q 736 784 732 759 Q 728 738 721 713 L 716 692 Q 709 664 700 632 L 693 607 Q 683 571 670 529 C 661 500 721 509 729 538 Z","M 721 713 Q 703 731 645 719 Q 624 712 607 706 Q 592 703 609 690 Q 610 689 716 692 C 745 693 744 693 721 713 Z","M 700 632 Q 670 650 591 622 Q 576 619 593 606 Q 597 602 609 603 Q 655 607 693 607 C 723 607 726 618 700 632 Z","M 194 459 Q 179 489 171 495 Q 155 508 153 484 Q 159 448 105 384 Q 89 363 113 314 Q 129 293 143 316 Q 143 317 189 430 C 198 452 198 452 194 459 Z","M 189 430 Q 217 414 245 421 Q 440 481 716 504 Q 780 511 801 508 Q 817 505 816 495 Q 794 450 770 405 L 771 404 Q 778 400 797 410 Q 855 443 902 451 Q 941 458 941 469 Q 938 479 870 537 Q 851 555 825 553 Q 779 546 729 538 L 670 529 Q 543 514 331 479 L 294 472 Q 243 466 194 459 C 164 455 161 441 189 430 Z","M 517 293 Q 634 368 668 375 Q 687 379 682 396 Q 679 412 618 450 Q 600 460 578 453 Q 514 431 414 403 Q 389 396 327 398 Q 305 398 312 379 Q 319 367 338 356 Q 368 340 399 359 Q 559 416 575 410 Q 585 404 582 393 Q 545 351 502 302 C 482 279 492 277 517 293 Z","M 546 249 Q 536 279 517 293 L 502 302 Q 495 308 483 311 Q 462 318 452 312 Q 439 305 453 292 Q 480 273 492 241 L 502 205 Q 523 90 492 24 Q 479 -4 442 0 Q 411 3 384 7 Q 372 8 378 -2 Q 382 -9 402 -20 Q 444 -50 459 -74 Q 469 -90 486 -88 Q 499 -87 525 -59 Q 594 25 556 210 L 546 249 Z","M 556 210 Q 649 217 868 218 Q 890 218 895 228 Q 902 241 883 256 Q 828 298 784 290 Q 693 271 546 249 L 492 241 Q 338 222 158 200 Q 134 199 152 179 Q 168 164 187 158 Q 211 151 229 157 Q 382 197 502 205 L 556 210 Z"],"medians":[[[383,786],[351,789],[290,724],[283,725]],[[217,728],[261,694],[304,509],[309,493],[324,485]],[[305,650],[309,660],[338,669],[381,677],[398,672]],[[321,566],[325,575],[355,583],[385,588],[405,584]],[[526,851],[539,824],[482,742],[436,703]],[[439,795],[536,739],[558,718],[564,704]],[[512,682],[525,657],[502,617],[464,565],[424,530]],[[438,639],[526,585],[547,564],[553,547]],[[610,806],[634,799],[738,809],[756,797],[772,771],[708,562],[677,535]],[[608,698],[658,707],[700,704],[712,710]],[[592,614],[692,627]],[[162,489],[173,455],[164,425],[128,359],[128,320]],[[202,450],[211,441],[235,442],[380,473],[589,506],[767,527],[832,525],[855,501],[859,485],[787,413],[776,410]],[[323,386],[363,373],[382,375],[567,430],[590,431],[611,418],[621,399],[612,385],[526,313],[524,305],[510,306]],[[456,302],[471,299],[505,271],[522,236],[538,154],[540,84],[533,40],[510,-15],[486,-37],[387,-1]],[[154,190],[210,180],[459,220],[785,254],[820,253],[881,235]]]},"一":{"strokes":["M 518 382 Q 572 385 623 389 Q 758 399 900 383 Q 928 379 935 390 Q 944 405 930 419 Q 896 452 845 475 Q 829 482 798 473 Q 723 460 480 434 Q 180 409 137 408 Q 130 408 124 408 Q 108 408 106 395 Q 105 380 127 363 Q 146 348 183 334 Q 195 330 216 338 Q 232 344 306 354 Q 400 373 518 382 Z"],"medians":[[[121,393],[193,372],[417,402],[827,434],[920,401]]]},"生":{"strokes":["M 324 495 Q 328 502 332 509 Q 357 558 382 599 Q 392 615 375 630 Q 318 663 296 657 Q 283 654 287 638 Q 308 536 204 397 Q 200 396 160 342 Q 153 324 169 330 Q 188 334 213 357 Q 273 409 311 471 L 324 495 Z","M 556 479 Q 748 518 754 521 Q 764 530 759 539 Q 752 552 721 561 Q 688 568 656 557 Q 607 544 558 529 L 500 516 Q 418 501 324 495 C 294 493 284 484 311 471 L 312 471 Q 351 447 432 459 Q 463 465 499 469 L 556 479 Z","M 549 276 Q 702 307 710 313 Q 720 322 715 331 Q 708 344 676 353 Q 649 359 551 329 L 495 315 Q 428 303 347 295 Q 308 291 336 271 Q 378 244 484 265 Q 488 266 495 267 L 549 276 Z","M 543 92 Q 546 186 549 276 L 551 329 Q 552 405 556 479 L 558 529 Q 567 718 580 760 Q 593 782 578 797 Q 538 828 506 838 Q 490 842 473 829 Q 467 820 474 808 Q 507 751 504 688 Q 503 604 500 516 L 499 469 Q 498 394 495 315 L 495 267 Q 492 179 492 86 C 492 56 542 62 543 92 Z","M 492 86 Q 330 70 144 51 Q 119 48 137 27 Q 173 -9 220 1 Q 520 73 900 54 Q 901 54 904 54 Q 929 53 935 63 Q 942 78 922 95 Q 856 144 785 129 Q 688 113 543 92 L 492 86 Z"],"medians":[[[299,644],[334,603],[309,529],[279,467],[247,420],[219,385],[171,341]],[[320,474],[402,478],[502,492],[690,536],[750,531]],[[338,285],[366,278],[417,279],[558,302],[664,328],[703,325]],[[486,820],[518,796],[535,776],[538,759],[518,115],[498,94]],[[141,39],[198,27],[411,58],[811,95],[886,85],[923,70]]]},"父":{"strokes":["M 312 721 Q 316 640 162 492 Q 153 488 164 484 Q 243 484 383 656 Q 390 665 394 668 Q 403 672 401 684 Q 400 694 387 707 Q 354 740 319 736 Q 309 735 312 721 Z","M 588 741 Q 661 698 748 631 Q 770 612 788 610 Q 798 610 805 623 Q 815 641 792 686 Q 770 743 583 776 Q 573 780 572 765 Q 573 750 588 741 Z","M 531 253 Q 577 332 601 441 Q 608 477 617 498 Q 624 511 615 522 Q 594 546 570 558 Q 546 573 535 570 Q 525 566 526 552 Q 553 429 489 298 L 465 251 Q 393 155 256 105 Q 205 89 133 71 Q 121 70 116 65 Q 109 61 119 55 Q 126 52 141 53 Q 265 60 355 100 Q 436 131 500 209 L 531 253 Z","M 500 209 Q 567 131 679 32 Q 716 -2 776 5 Q 855 12 913 17 Q 932 18 949 26 Q 959 36 942 46 Q 921 56 759 101 Q 654 129 531 253 L 489 298 Q 435 355 381 424 Q 353 461 304 471 Q 288 474 276 465 Q 269 456 281 446 Q 338 407 378 359 Q 423 305 465 251 L 500 209 Z"],"medians":[[[320,726],[342,703],[350,683],[333,651],[296,600],[239,539],[168,489]],[[586,762],[734,691],[765,663],[786,629]],[[539,558],[574,504],[563,422],[522,297],[465,208],[388,143],[315,106],[230,79],[123,62]],[[286,458],[320,445],[350,423],[562,183],[644,112],[702,72],[753,52],[941,34]]]},"門":{"strokes":["M 270 716 Q 246 740 213 748 Q 203 751 196 741 Q 192 735 200 724 Q 260 577 214 260 Q 205 202 186 142 Q 176 114 181 92 Q 191 55 203 41 Q 216 26 226 41 Q 263 80 264 255 Q 264 357 267 461 L 268 494 Q 268 534 271 565 L 272 599 Q 276 663 281 689 C 283 705 283 705 270 716 Z","M 386 477 Q 387 473 394 464 Q 416 433 436 460 Q 448 476 455 535 Q 458 649 485 690 Q 498 708 484 723 Q 465 738 435 754 Q 419 760 404 753 Q 341 729 270 716 C 241 710 253 680 281 689 Q 378 722 404 708 Q 413 702 412 672 Q 408 587 402 516 Q 401 506 397 499 C 388 473 384 481 386 477 Z","M 271 565 Q 320 575 357 580 Q 379 586 369 597 Q 359 610 334 613 Q 312 614 274 601 L 272 599 C 248 580 242 559 271 565 Z","M 267 461 Q 271 461 276 462 Q 310 471 386 477 C 416 479 418 480 397 499 Q 390 506 375 514 Q 360 521 332 513 Q 298 503 268 494 C 239 485 237 459 267 461 Z","M 631 767 Q 609 786 584 795 Q 578 798 573 794 Q 566 790 573 777 Q 603 714 594 569 Q 591 506 621 481 Q 622 481 624 479 Q 640 472 644 501 Q 644 504 644 506 L 645 540 Q 642 567 642 620 L 642 646 Q 642 695 644 735 C 645 756 645 756 631 767 Z","M 810 517 Q 816 115 795 78 Q 789 72 770 77 Q 743 83 716 90 Q 695 97 696 87 Q 754 35 785 -3 Q 798 -24 815 -28 Q 825 -32 833 -22 Q 876 27 875 86 Q 862 303 860 655 Q 859 716 873 744 Q 886 763 873 775 Q 851 794 811 810 Q 790 819 734 790 Q 698 778 631 767 C 601 762 615 729 644 735 Q 692 744 764 762 Q 783 766 791 755 Q 804 742 805 696 Q 808 618 809 545 L 810 517 Z","M 642 620 Q 643 620 648 620 Q 708 627 751 633 Q 773 637 765 649 Q 755 662 731 666 Q 698 670 642 646 C 614 634 612 620 642 620 Z","M 644 506 Q 651 505 663 506 Q 709 515 810 517 C 840 518 834 528 809 545 Q 803 549 794 556 Q 778 566 747 559 Q 692 546 645 540 C 615 536 614 508 644 506 Z"],"medians":[[[207,736],[243,696],[252,611],[251,453],[239,243],[215,101],[215,46]],[[279,712],[291,704],[342,721],[418,731],[448,702],[426,507],[416,478],[400,477]],[[278,570],[284,582],[304,591],[329,595],[361,590]],[[271,466],[284,481],[345,495],[388,497]],[[579,786],[610,752],[616,729],[618,559],[629,490]],[[641,765],[654,754],[787,786],[807,780],[835,752],[835,69],[815,35],[785,43],[706,84]],[[645,627],[658,637],[714,647],[755,643]],[[648,512],[660,523],[760,539],[792,535],[800,524]]]},"六":{"strokes":["M 472 702 Q 502 677 534 645 Q 552 629 572 630 Q 585 631 592 649 Q 598 668 585 705 Q 578 727 541 744 Q 447 771 436 764 Q 429 758 432 742 Q 436 729 472 702 Z","M 128 467 Q 103 464 121 443 Q 137 427 159 419 Q 184 412 205 418 Q 427 478 848 478 Q 875 478 901 477 Q 925 477 931 487 Q 938 502 918 519 Q 846 571 778 551 Q 514 509 128 467 Z","M 346 344 Q 342 241 202 138 Q 169 116 152 101 Q 139 86 157 88 Q 220 85 332 184 Q 405 257 428 279 Q 443 291 430 311 Q 391 359 360 361 Q 347 361 346 344 Z","M 611 302 Q 675 223 752 114 Q 767 86 785 79 Q 795 76 806 87 Q 822 100 815 155 Q 811 224 623 335 Q 620 338 618 338 Q 608 347 603 332 Q 600 316 611 302 Z"],"medians":[[[441,756],[455,743],[531,705],[568,654]],[[125,455],[184,444],[454,484],[805,517],[851,515],[918,494]],[[360,347],[383,297],[347,242],[292,181],[249,145],[162,97]],[[611,333],[753,186],[774,154],[789,97]]]},"校":{"strokes":["M 329 538 Q 416 569 417 570 Q 424 577 420 586 Q 413 596 385 600 Q 357 603 331 590 L 289 573 Q 199 540 125 527 Q 92 518 118 505 Q 158 486 207 503 Q 240 513 276 523 L 329 538 Z","M 326 414 Q 327 472 329 538 L 331 590 Q 332 686 353 750 Q 362 765 359 778 Q 352 788 298 821 Q 276 839 255 823 Q 251 819 256 803 Q 289 754 289 704 Q 289 643 289 573 L 284 419 Q 280 335 279 244 Q 273 165 252 93 Q 239 51 265 -6 Q 271 -24 279 -27 Q 285 -33 292 -25 Q 299 -21 310 -1 Q 320 24 319 54 Q 319 94 325 385 L 326 414 Z","M 276 523 Q 225 376 62 153 Q 56 143 68 142 Q 92 142 201 281 Q 244 339 284 419 C 352 553 286 551 276 523 Z","M 325 385 Q 341 369 375 325 Q 384 313 396 312 Q 403 311 409 321 Q 415 331 411 355 Q 410 371 386 387 Q 341 414 326 414 C 296 417 304 406 325 385 Z","M 591 758 Q 645 709 680 699 Q 695 698 703 712 Q 707 725 703 743 Q 684 785 599 798 Q 581 802 572 796 Q 566 795 570 782 Q 573 770 591 758 Z","M 497 606 Q 460 599 487 583 Q 532 559 587 574 Q 680 595 777 617 Q 820 629 827 635 Q 837 644 831 652 Q 824 664 794 671 Q 766 675 671 642 Q 562 614 497 606 Z","M 499 473 Q 484 440 432 360 Q 426 345 440 350 Q 483 386 539 441 Q 552 457 571 468 Q 587 478 576 492 Q 563 504 540 513 Q 519 522 509 518 Q 499 515 503 504 Q 507 489 499 473 Z","M 720 489 Q 765 459 812 423 Q 825 413 840 415 Q 850 416 853 428 Q 856 443 846 468 Q 833 507 712 532 Q 697 533 692 531 Q 688 527 690 515 Q 694 505 720 489 Z","M 655 208 Q 697 292 705 327 Q 715 370 726 384 Q 735 397 727 406 Q 715 419 689 427 Q 670 436 650 431 Q 638 427 645 413 Q 666 377 646 314 Q 636 277 619 245 L 600 215 Q 572 179 534 151 Q 482 114 371 77 Q 355 68 375 66 Q 538 57 632 172 L 655 208 Z","M 632 172 Q 755 16 818 14 Q 833 14 933 25 Q 946 26 959 31 Q 966 38 954 46 Q 939 53 822 91 Q 746 113 655 208 L 619 245 Q 591 278 560 316 Q 541 341 507 347 Q 497 350 487 343 Q 483 337 491 330 Q 498 324 505 319 Q 527 309 600 215 L 632 172 Z"],"medians":[[[119,517],[179,517],[367,577],[412,578]],[[267,816],[308,776],[318,754],[310,641],[302,250],[283,61],[284,-14]],[[283,519],[260,422],[224,356],[178,282],[69,150]],[[329,407],[385,353],[395,327]],[[581,788],[658,746],[682,722]],[[489,596],[512,590],[561,592],[774,644],[821,645]],[[516,507],[534,479],[441,359]],[[697,525],[806,468],[838,430]],[[653,421],[686,395],[688,382],[665,289],[623,203],[576,151],[518,112],[450,86],[382,75]],[[495,338],[534,319],[655,175],[716,115],[767,76],[810,54],[950,36]]]},"西":{"strokes":["M 581 694 Q 621 701 666 706 Q 738 719 749 728 Q 759 737 755 746 Q 748 761 715 770 Q 687 779 602 756 Q 437 713 262 705 Q 220 701 248 680 Q 294 650 358 661 Q 359 662 362 661 L 409 668 Q 460 677 515 684 L 581 694 Z","M 215 475 Q 187 494 155 502 Q 148 505 141 498 Q 131 491 143 477 Q 197 393 204 189 Q 205 120 248 84 Q 251 81 255 79 Q 277 73 278 110 Q 278 111 278 112 L 274 157 Q 246 346 241 434 C 239 460 239 460 215 475 Z","M 666 141 Q 705 75 712 43 Q 721 27 731 28 Q 747 29 763 54 Q 791 91 804 137 Q 825 198 858 421 Q 864 461 878 482 Q 899 504 884 511 Q 868 530 827 549 Q 802 567 775 557 Q 741 547 652 539 Q 612 536 574 531 L 533 526 Q 476 520 429 511 L 381 503 Q 377 503 375 502 Q 293 486 215 475 C 185 471 212 425 241 434 Q 241 435 245 436 Q 311 457 377 463 L 423 470 Q 480 480 532 485 L 571 490 Q 778 514 791 497 Q 798 490 794 447 Q 779 270 745 172 Q 738 147 716 151 Q 709 155 700 160 C 671 166 651 167 666 141 Z","M 362 661 Q 384 625 381 503 L 377 463 Q 368 385 316 275 Q 312 269 311 264 Q 310 254 318 257 Q 348 263 395 367 Q 396 370 398 373 Q 413 413 422 462 Q 422 466 423 470 L 429 511 Q 432 539 433 567 Q 433 600 437 628 Q 444 641 436 651 Q 426 661 409 668 C 382 681 349 688 362 661 Z","M 574 531 Q 580 592 599 662 Q 603 678 594 687 Q 588 691 581 694 C 555 709 500 710 515 684 Q 536 663 533 537 Q 533 533 533 526 L 532 485 Q 522 346 566 313 Q 588 294 683 306 Q 717 310 728 327 Q 737 339 729 346 Q 720 353 629 350 Q 566 347 571 479 Q 570 485 571 490 L 574 531 Z","M 278 112 Q 282 112 291 113 Q 412 135 666 141 C 696 142 716 142 700 160 Q 691 172 666 192 Q 647 205 607 198 Q 421 167 274 157 C 244 155 248 110 278 112 Z"],"medians":[[[252,694],[276,686],[346,684],[682,741],[741,741]],[[149,488],[185,461],[206,423],[238,169],[260,93]],[[223,473],[250,459],[481,500],[777,530],[799,529],[820,515],[836,492],[835,483],[797,244],[769,140],[739,105],[692,135],[677,135]],[[370,660],[405,631],[402,480],[375,363],[335,284],[319,265]],[[522,685],[562,656],[549,449],[558,377],[572,347],[587,333],[630,325],[687,328],[723,338]],[[284,120],[297,136],[371,146],[620,170],[692,161]]]},"韓":{"strokes":["M 337 653 Q 467 693 469 694 Q 476 701 472 709 Q 465 719 437 725 Q 409 729 348 702 L 299 685 Q 250 672 194 663 Q 161 656 186 641 Q 228 622 290 641 L 292 641 L 337 653 Z","M 313 557 Q 325 606 337 653 L 348 702 Q 352 745 381 801 Q 385 810 371 825 Q 344 846 325 853 Q 312 857 304 852 Q 297 846 301 833 Q 314 805 312 788 Q 308 739 299 685 L 292 641 Q 285 598 274 548 C 268 519 306 528 313 557 Z","M 186 527 Q 176 533 146 535 Q 136 538 132 533 Q 128 527 136 513 Q 166 455 187 361 Q 191 333 209 314 Q 225 295 230 309 Q 231 313 232 320 L 231 344 Q 228 368 217 409 L 212 431 Q 202 477 199 497 C 195 523 195 523 186 527 Z","M 359 342 Q 372 321 385 314 Q 394 307 408 325 Q 421 347 454 467 Q 461 494 482 516 Q 494 526 484 539 Q 471 554 434 577 Q 421 583 352 566 Q 346 566 313 557 L 274 548 Q 262 547 253 543 Q 217 534 186 527 C 157 520 170 488 199 497 Q 262 518 371 540 Q 393 544 403 537 Q 415 527 411 509 Q 381 382 366 369 C 354 349 354 349 359 342 Z","M 217 409 Q 221 409 228 410 Q 300 426 353 438 Q 374 442 365 453 Q 355 466 332 468 Q 316 469 212 431 C 184 421 187 407 217 409 Z","M 312 334 Q 334 338 359 342 C 389 347 394 358 366 369 Q 359 372 351 373 Q 321 376 231 344 C 203 334 202 320 232 320 Q 233 320 237 320 Q 256 324 276 327 L 312 334 Z","M 325 219 Q 377 232 443 245 Q 458 248 458 255 Q 459 267 442 274 Q 412 284 326 256 L 279 243 Q 159 210 66 195 Q 56 194 52 186 Q 51 176 64 167 Q 100 145 137 158 Q 218 188 277 206 L 325 219 Z","M 277 206 Q 277 106 263 70 Q 251 42 283 -9 Q 293 -27 299 -30 Q 309 -31 314 -20 Q 323 1 323 111 Q 323 168 325 219 L 326 256 Q 327 289 332 305 Q 333 315 328 321 Q 321 328 312 334 C 288 352 271 357 276 327 Q 280 314 279 243 L 277 206 Z","M 688 741 Q 691 774 714 826 Q 718 835 703 850 Q 676 869 656 876 Q 643 880 636 874 Q 629 868 634 855 Q 647 831 645 816 Q 642 774 638 728 L 634 696 Q 628 650 621 599 C 617 569 653 578 659 607 Q 669 659 681 707 L 688 741 Z","M 813 640 Q 831 689 858 708 Q 873 724 859 740 Q 846 750 799 772 Q 783 778 765 771 Q 725 752 688 741 L 638 728 Q 601 721 563 714 Q 548 713 550 703 Q 553 696 570 691 Q 585 685 634 696 L 681 707 Q 771 728 778 722 Q 790 707 764 629 C 755 600 802 612 813 640 Z","M 621 599 Q 569 590 513 579 Q 497 576 510 563 Q 522 553 537 549 Q 555 545 567 550 Q 741 607 939 607 L 941 607 Q 957 608 961 616 Q 965 626 950 636 Q 902 669 839 647 Q 826 644 813 640 L 764 629 Q 739 625 713 618 Q 686 614 659 607 L 621 599 Z","M 580 508 Q 573 512 544 514 Q 534 515 532 512 Q 528 506 536 494 Q 557 461 575 404 Q 579 386 590 376 Q 606 360 609 373 Q 610 377 610 384 L 606 412 Q 593 464 590 483 C 586 506 586 506 580 508 Z","M 793 437 Q 814 479 835 489 Q 848 502 838 517 Q 775 566 737 543 Q 680 525 580 508 C 550 503 561 477 590 483 L 739 511 Q 757 515 763 508 Q 769 499 752 444 C 743 415 779 410 793 437 Z","M 709 398 Q 748 405 802 410 Q 811 411 812 418 Q 812 424 793 437 L 752 444 Q 748 444 745 443 Q 669 424 606 412 C 577 406 580 383 610 384 Q 619 384 629 385 Q 642 389 662 391 L 709 398 Z","M 730 298 Q 766 307 807 314 Q 838 321 843 325 Q 850 332 846 339 Q 840 348 817 354 Q 793 358 733 338 L 681 325 Q 644 318 603 314 Q 573 310 594 295 Q 630 276 673 287 Q 674 288 681 288 L 730 298 Z","M 726 159 Q 801 171 918 167 Q 939 166 946 177 Q 952 186 934 197 Q 883 233 827 216 Q 805 212 782 206 Q 754 202 727 196 L 680 188 Q 625 179 572 165 Q 544 156 552 181 Q 565 233 576 252 Q 585 262 579 271 Q 573 281 541 296 Q 525 303 515 298 Q 505 289 515 277 Q 534 234 505 171 Q 481 147 482 131 Q 483 121 500 108 Q 512 101 524 112 Q 573 139 679 153 L 726 159 Z","M 727 196 Q 727 239 730 298 L 733 338 Q 736 353 739 363 Q 742 378 730 386 Q 718 395 709 398 C 682 412 647 417 662 391 Q 680 364 681 325 L 681 288 Q 681 243 680 188 L 679 153 Q 679 -43 691 -65 Q 695 -72 702 -69 Q 709 -66 713 -54 Q 725 -24 726 159 L 727 196 Z"],"medians":[[[187,653],[208,649],[261,654],[423,703],[465,703]],[[312,843],[345,804],[298,573],[279,556]],[[140,528],[167,507],[174,492],[220,314]],[[193,524],[211,517],[386,559],[425,552],[446,527],[390,352],[391,330]],[[222,416],[229,426],[317,448],[336,452],[357,447]],[[235,326],[246,338],[345,356],[357,364]],[[61,183],[79,178],[124,180],[361,248],[407,257],[447,257]],[[283,325],[305,305],[298,99],[291,53],[301,-20]],[[645,865],[678,827],[643,623],[626,606]],[[558,705],[622,708],[777,749],[787,747],[818,721],[802,673],[780,644]],[[512,571],[547,566],[695,600],[869,630],[921,629],[951,620]],[[539,507],[568,481],[600,377]],[[590,505],[598,498],[750,530],[776,527],[798,504],[781,462],[760,452]],[[614,392],[645,405],[741,423],[784,424],[804,418]],[[596,306],[605,301],[645,301],[794,333],[835,334]],[[523,288],[547,262],[526,148],[541,144],[675,171],[853,195],[934,182]],[[670,388],[707,364],[699,-59]]]},"敎":{"strokes":["M 388 654 Q 407 660 431 665 Q 462 674 468 678 Q 475 685 471 693 Q 464 703 437 709 Q 412 713 392 705 L 340 687 Q 259 666 211 658 Q 178 651 202 637 Q 244 616 295 632 Q 314 638 340 642 L 388 654 Z","M 376 528 Q 382 594 388 654 L 392 705 Q 395 744 410 794 Q 414 804 395 818 Q 364 836 342 840 Q 327 844 320 836 Q 313 829 320 815 Q 338 790 338 773 Q 339 733 340 687 L 340 642 Q 340 584 338 518 C 337 488 373 498 376 528 Z","M 427 498 Q 470 508 521 515 Q 537 518 538 525 Q 539 538 521 546 Q 494 558 473 552 L 403 535 Q 390 532 376 528 L 338 518 Q 182 484 108 474 Q 95 473 93 465 Q 90 455 105 443 Q 144 418 185 431 Q 329 480 363 484 L 427 498 Z","M 348 410 Q 348 411 349 411 Q 392 460 427 498 L 473 552 Q 551 646 568 656 Q 581 662 581 671 Q 580 677 568 682 Q 540 698 514 701 Q 499 702 493 687 Q 484 642 403 535 L 363 484 Q 326 439 276 385 L 240 346 Q 173 276 74 196 Q 67 192 69 189 Q 70 186 77 188 Q 140 212 216 278 Q 298 356 313 360 C 334 373 328 388 348 410 Z","M 387 295 Q 462 367 484 376 Q 500 382 494 395 Q 490 408 434 434 Q 418 441 400 432 Q 376 422 348 410 L 276 385 Q 257 382 229 381 Q 210 380 218 364 Q 225 354 240 346 C 264 331 287 345 313 360 Q 383 402 403 392 Q 413 385 410 374 Q 394 341 374 302 C 360 275 365 274 387 295 Z","M 423 240 Q 411 280 387 295 L 374 302 Q 368 306 360 308 Q 341 314 331 308 Q 319 301 333 290 Q 366 266 376 222 L 383 190 Q 392 103 372 58 Q 360 39 333 45 Q 308 51 284 57 Q 274 61 277 50 Q 281 43 296 31 Q 329 0 339 -24 Q 348 -40 362 -39 Q 375 -38 399 -14 Q 462 49 430 212 L 423 240 Z","M 430 212 Q 437 216 445 219 Q 505 247 505 264 Q 501 268 489 266 Q 456 254 423 240 L 376 222 Q 289 192 195 159 Q 174 152 140 150 Q 128 149 127 139 Q 126 127 134 120 Q 155 107 186 90 Q 196 89 206 96 Q 248 129 383 190 L 430 212 Z","M 607 512 Q 671 630 693 675 Q 699 708 727 746 Q 736 761 730 775 Q 723 788 690 806 Q 659 819 640 816 Q 621 812 633 790 Q 663 750 597 591 Q 566 519 522 437 Q 513 424 512 418 Q 511 405 524 411 Q 542 418 592 487 L 607 512 Z","M 727 486 Q 884 526 888 529 Q 897 539 892 547 Q 883 560 852 567 Q 819 571 787 558 Q 748 543 705 531 Q 659 521 607 512 C 577 507 565 500 592 487 Q 632 466 689 478 L 727 486 Z","M 708 211 Q 747 286 767 408 Q 771 433 777 444 Q 784 451 778 461 Q 763 479 727 486 C 698 493 682 497 689 478 Q 689 475 700 449 Q 724 391 672 255 Q 671 255 671 252 L 651 214 Q 650 213 649 211 Q 600 139 468 78 Q 443 65 473 65 Q 560 62 654 139 Q 666 154 681 170 L 708 211 Z","M 681 170 Q 726 106 768 52 Q 783 33 808 31 Q 946 30 958 42 Q 962 49 952 52 Q 789 122 713 206 Q 710 209 708 211 L 671 252 Q 634 295 592 351 Q 582 367 566 370 Q 542 371 535 365 Q 532 361 540 355 Q 573 334 593 300 Q 621 255 651 214 L 681 170 Z"],"medians":[[[204,649],[214,644],[254,645],[415,686],[460,687]],[[331,826],[372,791],[359,554],[354,536],[343,526]],[[104,461],[162,454],[471,530],[528,528]],[[573,670],[523,663],[464,576],[297,377],[162,250],[73,191]],[[226,371],[244,364],[274,368],[388,410],[422,410],[444,391],[392,308],[384,305]],[[335,299],[349,296],[378,274],[401,227],[413,158],[407,65],[389,27],[366,8],[285,49]],[[139,138],[190,124],[500,261]],[[642,801],[672,780],[685,760],[665,689],[595,531],[560,470],[521,419]],[[601,490],[716,508],[844,543],[883,538]],[[696,475],[726,458],[739,446],[739,438],[722,320],[694,239],[658,181],[618,141],[542,94],[480,75]],[[542,362],[557,360],[587,336],[705,178],[797,83],[821,71],[888,54],[953,46]]]},"軍":{"strokes":["M 316 796 Q 304 820 293 827 Q 274 842 272 814 Q 278 769 223 709 Q 204 685 233 630 Q 252 606 267 633 Q 283 658 294 694 Q 307 739 317 764 C 324 781 324 781 316 796 Z","M 317 764 Q 330 760 372 765 Q 516 804 708 817 Q 730 818 740 816 Q 750 809 747 803 Q 747 802 707 731 Q 697 716 703 712 Q 712 708 730 718 Q 790 751 836 759 Q 875 765 875 776 Q 874 786 806 841 Q 782 863 718 851 Q 586 835 407 809 Q 361 802 316 796 C 286 792 287 767 317 764 Z","M 542 645 Q 659 667 666 672 Q 673 679 670 686 Q 664 696 640 703 Q 616 709 548 689 L 489 675 Q 438 668 385 663 Q 354 659 375 644 Q 405 628 479 636 Q 483 637 491 637 L 542 645 Z","M 339 545 Q 329 551 292 556 Q 280 557 277 553 Q 271 546 280 531 Q 313 471 336 372 Q 340 341 359 323 Q 378 301 383 318 L 385 330 L 383 359 Q 382 371 379 383 Q 357 477 351 512 C 346 542 346 542 339 545 Z","M 634 360 Q 649 335 664 325 Q 674 316 692 337 Q 707 356 745 472 Q 755 503 781 526 Q 794 538 784 553 Q 771 571 729 600 Q 708 612 643 594 Q 613 593 541 578 L 490 570 Q 469 569 448 564 Q 390 554 339 545 C 309 540 322 504 351 512 Q 408 528 490 542 L 541 551 Q 668 573 689 557 Q 701 547 695 529 Q 667 418 656 402 Q 652 393 641 390 C 623 376 623 376 634 360 Z","M 540 454 Q 574 463 608 467 Q 630 471 621 484 Q 611 499 585 502 Q 567 503 541 496 L 490 479 Q 456 469 426 457 Q 410 453 431 439 Q 440 433 458 437 Q 474 441 490 443 L 540 454 Z","M 540 349 Q 589 356 634 360 C 664 363 668 376 641 390 Q 613 408 548 391 Q 544 391 540 388 L 488 378 Q 433 368 383 359 C 353 354 355 329 385 330 Q 394 330 404 331 Q 447 338 487 342 L 540 349 Z","M 542 220 Q 617 226 919 227 Q 941 226 947 236 Q 953 249 935 264 Q 868 315 821 297 Q 712 281 541 255 L 485 249 Q 319 231 130 212 Q 108 211 124 191 Q 140 175 159 169 Q 183 162 200 167 Q 324 198 462 212 Q 472 213 485 214 L 542 220 Z","M 485 214 Q 485 -36 497 -58 Q 498 -61 501 -65 Q 507 -72 515 -70 Q 533 -58 537 2 Q 552 149 542 220 L 541 255 Q 540 294 540 349 L 540 388 Q 540 419 540 454 L 541 496 Q 541 523 541 551 L 541 578 Q 541 611 542 645 L 548 689 Q 551 708 555 724 Q 558 743 543 752 Q 509 774 492 778 Q 479 782 462 773 Q 453 764 461 754 Q 486 697 489 675 L 491 637 Q 491 606 490 570 L 490 542 Q 490 512 490 479 L 490 443 Q 489 412 488 378 L 487 342 Q 486 299 485 249 L 485 214 Z"],"medians":[[[283,820],[294,790],[291,768],[251,681],[249,637]],[[322,770],[334,780],[536,814],[731,836],[763,829],[781,815],[792,795],[709,717]],[[378,655],[417,649],[467,652],[615,682],[660,681]],[[286,546],[313,525],[323,508],[371,323]],[[347,542],[361,532],[657,582],[692,582],[714,574],[738,541],[694,413],[670,366],[672,344]],[[428,448],[579,483],[612,477]],[[389,338],[407,348],[632,384]],[[127,201],[182,191],[572,242],[843,264],[896,256],[934,243]],[[470,763],[496,747],[515,725],[518,685],[511,-59]]]},"十":{"strokes":["M 541 450 Q 754 474 901 462 Q 935 462 940 467 Q 949 482 935 494 Q 862 560 793 538 Q 745 529 542 499 L 482 492 Q 355 479 290 469 Q 218 457 112 455 Q 97 455 96 443 Q 95 430 116 414 Q 134 401 168 388 Q 180 384 199 393 Q 215 399 292 413 Q 377 434 482 444 L 541 450 Z","M 482 444 Q 482 240 478 171 Q 475 -6 495 -40 Q 511 -56 521 -34 Q 539 21 540 425 Q 540 438 541 450 L 542 499 Q 543 722 569 763 Q 576 781 555 798 Q 528 819 482 830 Q 461 836 447 821 Q 437 812 450 799 Q 480 774 482 739 Q 482 651 482 492 L 482 444 Z"],"medians":[[[109,442],[177,422],[373,456],[819,505],[869,499],[932,476]],[[456,811],[484,803],[522,767],[512,593],[507,-33]]]},"靑":{"strokes":["M 543 709 Q 704 745 709 748 Q 716 754 714 760 L 713 762 Q 706 776 678 782 Q 655 789 547 756 L 486 741 Q 419 729 343 723 Q 342 723 341 722 Q 307 714 332 701 Q 363 679 412 685 L 488 698 L 543 709 Z","M 536 595 Q 568 604 674 615 L 678 615 Q 684 617 692 626 Q 692 632 684 641 Q 652 670 543 635 Q 539 635 538 634 L 490 623 L 349 604 Q 331 600 336 592 Q 363 565 402 570 Q 408 570 414 572 Q 455 582 490 587 L 536 595 Z","M 490 587 Q 490 515 490 504 C 490 474 530 481 531 511 Q 532 557 536 595 L 538 634 Q 539 668 543 709 L 547 756 Q 547 765 561 815 Q 563 825 544 840 Q 498 864 474 862 Q 456 860 459 845 L 463 835 Q 480 808 486 741 L 488 698 Q 490 666 490 623 L 490 587 Z","M 490 504 Q 377 490 300 474 Q 254 466 214 462 L 125 455 Q 116 453 116 443 L 116 439 Q 121 421 151 409 Q 186 394 208 402 Q 334 454 666 492 Q 779 506 919 494 Q 927 494 932 494 Q 956 498 949 517 Q 946 521 939 527 Q 911 551 870 568 Q 861 570 847 568 L 832 564 Q 792 549 702 536 Q 547 514 531 511 L 490 504 Z","M 414 202 Q 418 241 417 284 Q 420 333 425 355 C 429 375 429 375 418 385 Q 394 410 363 409 Q 352 405 353 396 Q 396 291 345 119 Q 321 59 321 55 Q 333 -11 355 -11 Q 370 -11 392 74 Q 412 145 412 174 L 414 202 Z","M 425 355 L 429 355 L 500 370 L 549 378 Q 594 386 606 382 Q 618 379 625 367 Q 635 345 639 242 L 641 196 Q 642 134 641 94 L 639 55 Q 639 37 632 29 Q 623 19 589 23 L 555 25 Q 547 27 545 24 Q 543 14 563 4 Q 579 -10 594 -24 L 627 -57 Q 641 -71 655 -69 Q 669 -65 687 -29 Q 715 27 710 77 L 692 300 Q 688 339 704 373 Q 711 390 710 396 Q 700 417 641 437 Q 622 446 568 422 L 418 385 C 389 378 395 350 425 355 Z","M 500 370 L 500 215 C 500 185 537 193 539 223 L 549 378 C 551 408 500 400 500 370 Z","M 500 215 Q 454 206 414 202 C 384 199 382 177 412 174 Q 454 169 523 178 L 641 196 C 671 201 669 246 639 242 L 590 235 L 539 223 L 500 215 Z"],"medians":[[[334,713],[402,706],[553,732],[638,756],[681,762],[705,757]],[[346,594],[405,591],[633,633],[684,627]],[[472,849],[517,807],[511,528],[497,507]],[[131,441],[196,430],[483,487],[856,534],[934,510]],[[365,397],[392,370],[396,295],[383,152],[353,53],[354,-1]],[[427,363],[437,373],[606,409],[639,403],[664,381],[662,319],[675,98],[672,33],[663,8],[646,-14],[550,20]],[[544,371],[523,347],[521,248],[505,223]],[[419,181],[429,188],[493,193],[617,215],[634,234]]]},"國":{"strokes":["M 248 751 Q 236 763 213 771 Q 201 777 188 772 Q 179 766 186 751 Q 211 655 213 647 Q 228 479 206 249 Q 200 194 182 128 Q 164 62 207 10 Q 220 -6 232 9 Q 242 22 245 36 L 250 78 Q 254 117 254 175 Q 264 665 268 697 Q 268 701 268 704 C 269 734 270 736 248 751 Z","M 750 68 Q 771 47 795 -3 Q 805 -27 821 -26 Q 834 -25 844 -3 Q 877 57 853 252 Q 829 693 853 728 Q 854 734 859 737 Q 871 752 870 760 Q 869 773 834 797 Q 779 834 764 831 Q 754 831 745 827 Q 727 820 672 810 Q 510 791 317 755 Q 281 751 248 751 C 218 750 239 697 268 704 Q 278 705 295 710 Q 310 716 440 739 Q 603 767 728 777 Q 755 778 761 765 Q 788 738 788 416 Q 791 220 793 175 Q 797 124 786 103 Q 782 90 776 90 C 764 63 740 82 750 68 Z","M 542 580 L 650 604 Q 651 607 654 609 Q 655 619 635 627 Q 608 646 537 619 Q 536 619 534 618 L 499 608 Q 493 608 326 573 Q 302 569 322 555 Q 352 534 375 541 Q 432 557 506 572 L 542 580 Z","M 331 473 Q 324 477 304 480 Q 295 481 292 478 Q 288 474 294 461 Q 315 418 328 348 Q 331 327 343 313 Q 356 297 361 308 Q 362 315 364 326 L 361 356 Q 349 429 348 450 C 347 466 347 466 331 473 Z","M 469 372 Q 484 435 501 453 Q 520 474 501 485 Q 485 495 463 508 Q 447 517 432 507 Q 413 494 387 487 Q 365 480 331 473 C 302 467 319 443 348 450 Q 351 451 415 466 Q 434 469 438 462 Q 441 459 430 377 C 426 347 462 343 469 372 Z","M 364 326 Q 436 341 479 345 Q 489 346 489 354 Q 489 360 469 372 L 430 377 Q 424 377 421 375 Q 387 363 361 356 C 332 348 335 320 364 326 Z","M 287 244 Q 277 243 276 234 Q 275 224 282 218 Q 301 206 327 193 Q 334 192 344 198 Q 357 210 476 275 Q 492 282 502 293 Q 512 300 512 307 Q 508 311 498 308 Q 320 245 287 244 Z","M 597 302 Q 643 220 698 179 Q 720 161 732 161 Q 744 160 750 169 Q 756 176 749 211 Q 743 268 747 311 Q 750 333 743 335 Q 737 336 729 316 Q 705 249 688 260 Q 670 272 623 341 L 600 388 Q 570 452 542 580 L 534 618 Q 531 648 530 673 Q 537 694 533 703 Q 529 710 509 720 Q 491 730 480 731 Q 471 730 470 730 Q 452 724 468 707 Q 480 704 499 608 L 506 572 Q 534 437 578 342 L 597 302 Z","M 578 342 Q 545 284 448 174 Q 441 170 451 168 Q 511 183 593 296 Q 594 300 597 302 L 623 341 Q 651 387 690 466 Q 705 494 705 498 Q 702 507 690 516 Q 677 526 660 529 Q 641 533 632 529 Q 625 528 628 516 Q 640 476 600 388 L 578 342 Z","M 638 678 Q 660 659 684 635 Q 696 625 708 625 Q 717 626 721 637 Q 725 649 718 673 Q 714 689 688 701 Q 631 725 616 719 Q 612 715 613 705 Q 616 695 638 678 Z","M 245 36 Q 252 36 260 37 Q 417 62 750 68 C 780 69 795 69 776 90 Q 769 100 749 116 Q 730 129 693 123 Q 447 86 250 78 C 220 77 215 34 245 36 Z"],"medians":[[[196,761],[223,732],[234,698],[241,595],[233,247],[214,98],[220,16]],[[255,747],[283,730],[520,772],[749,801],[776,796],[804,770],[815,752],[814,459],[829,151],[826,100],[814,57],[819,-9]],[[322,564],[359,559],[586,612],[617,616],[646,611]],[[299,473],[319,456],[328,434],[353,313]],[[340,471],[353,464],[438,486],[457,482],[470,466],[452,394],[438,389]],[[371,334],[378,345],[430,358],[480,354]],[[289,231],[330,224],[437,268],[443,276],[460,278],[465,286],[479,288],[505,306]],[[472,718],[493,708],[507,688],[514,623],[536,519],[587,368],[630,290],[681,232],[708,221],[727,264],[731,301],[742,329]],[[640,520],[664,488],[647,436],[603,345],[524,236],[455,174]],[[621,711],[685,672],[706,641]],[[252,42],[268,59],[316,64],[705,96],[769,90]]]},"北":{"strokes":["M 343 159 Q 343 147 361 108 Q 368 92 375 89 Q 381 83 388 90 Q 395 94 405 115 Q 408 124 412 224 Q 406 578 426 645 Q 433 660 431 672 Q 424 682 371 713 Q 349 729 330 714 Q 326 710 331 694 Q 352 666 358 585 Q 361 522 361 466 L 361 426 Q 361 249 344 197 L 343 159 Z","M 361 466 Q 345 470 331 466 Q 208 436 163 431 Q 150 430 148 421 Q 145 411 161 400 Q 200 375 241 390 Q 302 415 361 426 C 390 432 390 460 361 466 Z","M 344 197 Q 263 173 169 148 Q 154 144 129 145 Q 116 144 113 131 Q 112 116 122 108 Q 147 90 185 70 Q 197 67 210 77 Q 244 108 343 159 C 370 173 373 205 344 197 Z","M 597 384 Q 772 472 828 489 Q 837 492 848 494 Q 876 501 867 524 Q 857 546 829 570 Q 804 592 788 592 Q 773 593 775 576 Q 772 534 680 471 Q 640 443 598 411 C 574 393 570 371 597 384 Z","M 942 82 Q 961 100 940 135 Q 916 198 908 279 Q 908 291 899 300 Q 887 306 884 280 Q 877 250 867 201 Q 860 153 846 134 Q 840 121 815 116 Q 776 106 722 110 Q 682 111 656 122 Q 619 137 607 181 Q 595 220 597 384 L 598 411 Q 598 570 626 682 Q 632 712 638 719 Q 648 744 627 759 Q 596 787 554 797 Q 533 801 524 792 Q 515 782 523 771 Q 548 750 549 671 Q 534 262 555 169 Q 570 114 611 82 Q 680 31 846 44 Q 862 47 878 50 Q 923 63 942 82 Z"],"medians":[[[341,707],[367,685],[388,652],[386,287],[376,177],[381,102]],[[160,418],[189,411],[227,414],[334,443],[352,459]],[[129,129],[187,113],[323,169],[338,191]],[[786,581],[796,567],[805,529],[751,489],[609,404],[607,390]],[[534,781],[573,755],[590,727],[574,562],[569,334],[579,183],[599,134],[640,97],[709,78],[793,76],[844,83],[873,95],[893,111],[895,126],[896,291]]]},"土":{"strokes":["M 535 428 Q 602 441 673 451 Q 739 464 749 472 Q 759 481 755 490 Q 748 505 715 514 Q 681 523 647 511 Q 592 495 537 481 L 483 470 Q 395 454 293 449 Q 251 445 280 424 Q 320 397 409 409 Q 445 415 483 420 L 535 428 Z","M 521 151 Q 528 293 535 428 L 537 481 Q 538 595 566 720 Q 570 733 546 751 Q 504 773 475 779 Q 456 783 446 773 Q 436 763 447 746 Q 481 694 481 658 Q 484 567 483 470 L 483 420 Q 480 290 471 145 C 469 115 520 121 521 151 Z","M 471 145 Q 314 130 132 111 Q 107 110 125 87 Q 162 50 211 60 Q 452 121 842 114 Q 875 113 903 112 Q 928 111 935 122 Q 942 137 922 154 Q 847 212 795 192 Q 689 176 521 151 L 471 145 Z"],"medians":[[[283,438],[312,430],[379,430],[486,445],[692,487],[741,485]],[[461,760],[517,714],[518,685],[498,173],[476,153]],[[129,99],[188,87],[378,115],[818,156],[866,149],[922,129]]]},"先":{"strokes":["M 365 586 Q 368 598 406 663 Q 415 676 399 688 Q 354 718 332 710 Q 322 707 325 693 Q 343 618 271 511 Q 268 511 240 468 Q 233 452 247 458 Q 290 471 351 562 L 365 586 Z","M 538 574 Q 700 613 707 619 Q 717 628 711 636 Q 704 648 674 655 Q 643 659 613 647 Q 579 635 542 623 L 489 608 Q 429 595 365 586 C 335 582 323 574 351 562 Q 387 543 463 557 Q 473 560 488 562 L 538 574 Z","M 526 433 Q 532 506 538 574 L 542 623 Q 546 695 567 784 Q 571 794 550 811 Q 514 830 489 836 Q 473 840 464 831 Q 457 824 464 807 Q 486 774 486 752 Q 489 683 489 608 L 488 562 Q 487 498 482 425 C 480 395 524 403 526 433 Z","M 570 401 Q 592 404 812 419 Q 833 420 837 428 Q 841 441 825 453 Q 771 489 733 480 Q 654 459 526 433 L 482 425 Q 346 401 191 375 Q 170 372 187 355 Q 217 328 257 338 Q 368 375 520 395 L 570 401 Z","M 388 341 Q 388 227 260 111 Q 257 110 255 107 Q 219 73 134 18 Q 125 11 131 7 Q 162 -5 263 57 Q 357 111 432 250 Q 445 272 462 293 Q 472 302 467 313 Q 463 325 433 345 Q 412 361 402 359 Q 389 358 388 341 Z","M 974 49 Q 956 101 947 192 Q 946 208 938 214 Q 929 220 925 198 Q 906 87 890 67 Q 857 31 729 31 Q 659 32 628 45 Q 603 58 596 76 Q 572 143 590 261 Q 594 306 607 332 Q 622 371 570 401 C 546 419 508 422 520 395 Q 544 353 539 295 Q 533 79 563 34 Q 606 -32 831 -22 Q 919 -18 955 0 Q 986 16 974 49 Z"],"medians":[[[336,698],[365,666],[341,592],[298,519],[249,467]],[[358,566],[478,582],[653,630],[701,629]],[[476,821],[515,789],[524,768],[507,459],[488,433]],[[189,365],[246,360],[449,403],[736,447],[788,445],[826,434]],[[404,343],[422,311],[421,298],[387,225],[343,160],[305,119],[243,67],[175,26],[136,12]],[[527,391],[564,369],[573,352],[560,214],[561,139],[580,53],[616,23],[695,6],[772,3],[877,16],[925,37],[933,98],[935,205]]]},"母":{"strokes":["M 383 734 Q 331 780 318 769 Q 311 759 310 746 Q 346 674 296 470 Q 295 466 293 461 L 284 426 Q 242 282 195 236 Q 174 215 217 167 Q 226 157 242 165 Q 315 201 494 201 Q 602 204 630 195 L 690 185 Q 763 172 831 147 Q 855 137 866 141 Q 879 145 871 166 Q 862 188 808 229 Q 789 245 699 237 L 639 237 Q 455 243 291 233 Q 269 230 276 249 Q 307 352 332 433 L 341 465 Q 369 568 381 627 Q 387 669 396 696 C 402 719 402 719 383 734 Z","M 723 506 Q 727 671 740 705 Q 755 729 743 737 Q 736 750 676 788 Q 660 801 611 783 Q 529 762 383 734 C 354 728 367 689 396 696 Q 408 697 423 702 Q 618 756 646 731 Q 662 724 663 692 Q 664 586 664 498 L 662 456 Q 659 333 639 237 L 630 195 Q 596 78 572 59 Q 565 55 531 67 Q 506 77 490 83 Q 477 86 480 73 Q 483 64 502 50 Q 544 7 563 -26 Q 594 -56 614 -36 Q 657 19 690 185 L 699 237 Q 708 276 721 457 L 723 506 Z","M 463 611 Q 485 589 510 562 Q 522 549 537 548 Q 547 548 553 561 Q 557 574 551 604 Q 547 622 519 636 Q 458 663 440 659 Q 436 655 436 643 Q 439 633 463 611 Z","M 721 457 Q 785 458 857 455 Q 947 452 954 461 Q 960 474 943 489 Q 885 537 810 519 Q 770 513 723 506 L 664 498 Q 589 491 500 480 Q 424 473 341 465 L 293 461 Q 187 454 74 443 Q 52 442 68 423 Q 83 407 101 401 Q 123 394 141 399 Q 210 415 284 426 L 332 433 Q 378 440 428 444 Q 525 456 662 456 L 721 457 Z","M 429 361 Q 477 301 507 288 Q 522 284 531 297 Q 538 309 536 325 Q 524 374 444 397 L 443 398 Q 427 402 418 400 Q 411 399 413 387 Q 414 375 429 361 Z"],"medians":[[[325,759],[357,704],[347,591],[306,420],[236,214],[285,207],[406,219],[532,221],[735,209],[796,196],[860,155]],[[394,731],[411,719],[546,750],[643,764],[668,756],[701,720],[686,358],[669,235],[637,104],[611,43],[592,16],[561,28],[490,73]],[[444,653],[512,606],[536,566]],[[71,433],[123,422],[383,456],[838,490],[897,484],[947,468]],[[424,390],[491,339],[513,307]]]},"外":{"strokes":["M 308 582 Q 324 603 341 625 Q 363 659 381 675 Q 391 685 387 697 Q 384 710 359 732 Q 334 751 317 751 Q 299 750 306 730 Q 315 706 289 651 Q 235 554 132 436 Q 122 427 119 422 Q 115 412 129 413 Q 172 419 298 570 L 308 582 Z","M 298 570 Q 313 555 348 561 Q 414 579 419 569 Q 426 551 400 485 Q 378 412 302 313 Q 227 207 102 105 Q 77 89 99 91 Q 190 100 312 243 Q 412 378 463 483 Q 491 546 511 564 Q 524 574 518 587 Q 512 599 455 621 Q 442 627 418 614 Q 385 598 308 582 C 283 577 283 577 298 570 Z","M 210 413 Q 258 364 295 347 Q 308 346 316 357 Q 320 367 318 382 Q 303 422 221 446 Q 220 447 219 447 Q 206 451 197 447 Q 191 446 194 435 Q 195 425 210 413 Z","M 649 540 Q 649 696 669 770 Q 682 797 652 818 Q 636 830 609 845 Q 584 861 563 846 Q 557 840 564 824 Q 601 772 602 718 Q 603 640 607 551 Q 606 397 603 226 Q 599 142 577 64 Q 567 22 594 -41 Q 601 -60 609 -63 Q 616 -70 624 -61 Q 631 -57 642 -35 Q 652 -8 651 24 Q 650 76 649 513 L 649 540 Z","M 649 513 Q 742 467 881 378 Q 903 362 919 362 Q 928 363 932 375 Q 942 391 918 431 Q 885 492 649 540 C 620 546 622 526 649 513 Z"],"medians":[[[316,738],[328,728],[344,693],[307,625],[204,491],[155,440],[127,421]],[[307,573],[357,576],[398,589],[437,592],[462,572],[406,428],[309,279],[209,170],[154,126],[104,97]],[[204,439],[266,399],[300,367]],[[576,837],[631,783],[628,261],[612,34],[615,-49]],[[660,533],[664,522],[778,478],[854,439],[887,416],[916,378]]]},"九":{"strokes":["M 388 486 Q 319 225 74 56 Q 59 44 74 41 Q 92 42 133 60 Q 217 103 278 166 Q 348 230 380 303 Q 438 441 451 505 L 456 539 Q 456 593 481 702 Q 487 733 500 762 Q 510 784 490 795 Q 430 835 398 823 Q 382 817 390 799 Q 411 762 412 689 Q 402 550 396 523 L 388 486 Z","M 451 505 Q 520 527 570 535 Q 592 539 598 534 Q 602 527 598 511 Q 490 112 639 36 Q 676 18 741 10 Q 877 -3 968 54 Q 989 66 980 90 Q 961 156 954 255 Q 953 274 946 273 Q 940 273 935 254 Q 925 212 913 164 Q 903 127 879 104 Q 860 86 800 80 Q 733 70 679 89 Q 631 104 616 136 Q 594 173 602 259 Q 612 350 654 464 Q 673 512 702 538 Q 718 551 717 564 Q 716 576 646 607 Q 631 617 613 602 Q 568 572 456 539 L 396 523 Q 335 510 278 493 Q 232 483 156 482 Q 141 483 144 467 Q 147 455 174 439 Q 205 421 243 437 Q 321 465 388 486 L 451 505 Z"],"medians":[[[402,808],[428,792],[451,765],[424,515],[412,464],[374,360],[330,274],[266,191],[170,103],[78,49]],[[153,472],[190,458],[227,459],[587,561],[638,560],[646,551],[639,520],[618,464],[589,349],[576,202],[589,136],[603,107],[642,70],[679,55],[736,43],[801,43],[872,55],[917,78],[932,98],[946,267]]]},"長":{"strokes":["M 428 767 Q 446 764 517 774 Q 682 813 687 817 Q 696 824 691 833 Q 684 843 656 850 Q 626 856 597 843 Q 558 830 515 818 Q 469 806 413 800 C 383 797 398 769 428 767 Z","M 424 412 Q 423 475 422 527 L 421 554 Q 421 599 421 645 L 421 669 Q 424 739 428 759 L 428 767 C 430 788 430 788 413 800 Q 389 819 361 830 Q 345 837 335 830 Q 326 823 333 806 Q 358 751 368 694 Q 374 636 379 403 C 380 373 424 382 424 412 Z","M 421 645 Q 463 632 504 641 Q 558 653 614 664 Q 639 671 643 674 Q 652 681 647 689 Q 640 699 614 706 Q 586 710 559 700 Q 531 690 499 682 Q 465 675 424 670 Q 421 670 421 669 C 392 663 392 653 421 645 Z","M 422 527 Q 464 515 500 524 Q 558 536 619 548 Q 647 554 651 558 Q 658 565 655 573 Q 648 583 622 590 Q 594 596 567 585 Q 536 575 502 566 Q 465 559 421 554 C 391 551 393 535 422 527 Z","M 454 379 Q 535 394 827 411 Q 848 412 853 421 Q 859 434 840 448 Q 779 491 714 470 Q 609 448 424 412 L 379 403 Q 264 385 137 364 Q 115 361 131 343 Q 168 313 207 325 Q 244 337 287 347 L 345 360 Q 369 367 399 371 L 454 379 Z","M 287 347 Q 314 307 314 197 Q 314 130 300 88 Q 293 52 257 10 Q 245 -2 253 -23 Q 262 -51 276 -64 Q 289 -74 302 -59 Q 354 5 511 134 Q 527 144 528 154 Q 529 160 524 159 Q 511 158 376 72 Q 366 66 361 70 Q 357 73 357 85 Q 363 301 367 324 Q 371 342 359 351 Q 355 355 345 360 C 320 377 273 374 287 347 Z","M 621 241 Q 715 319 730 325 Q 749 337 738 352 Q 725 368 698 379 Q 674 389 663 386 Q 651 383 656 371 Q 662 344 600 257 C 583 233 598 222 621 241 Z","M 600 257 Q 537 308 454 379 C 431 398 372 383 399 371 Q 442 355 472 318 Q 623 162 744 56 Q 766 35 797 40 Q 909 59 952 72 Q 971 76 977 86 Q 981 95 968 97 Q 782 131 672 205 Q 648 221 621 241 L 600 257 Z"],"medians":[[[421,797],[451,785],[527,796],[624,826],[681,827]],[[345,819],[384,777],[396,702],[401,430],[384,415]],[[425,663],[445,655],[481,658],[594,684],[636,684]],[[429,548],[438,539],[463,539],[601,569],[644,568]],[[135,353],[184,346],[437,397],[731,440],[778,442],[841,427]],[[295,346],[333,324],[338,176],[328,86],[330,36],[385,53],[523,154]],[[664,377],[690,343],[623,262],[613,263]],[[406,369],[451,362],[653,180],[783,92],[967,87]]]},"兄":{"strokes":["M 322 712 Q 310 716 283 720 Q 270 723 267 718 Q 260 711 270 694 Q 307 622 329 503 Q 333 467 355 444 Q 374 422 379 438 Q 382 448 382 460 L 380 491 Q 379 503 376 516 Q 349 640 343 678 C 338 708 338 708 322 712 Z","M 642 526 Q 679 649 723 681 Q 744 703 727 724 Q 642 796 573 762 Q 468 731 322 712 C 292 708 313 674 343 678 Q 353 678 574 718 Q 599 722 610 712 Q 623 699 618 674 Q 602 596 581 534 C 572 505 633 497 642 526 Z","M 542 484 Q 587 491 648 497 Q 658 498 660 507 Q 660 514 642 526 C 618 543 610 541 581 534 Q 469 506 380 491 C 350 486 352 465 382 460 Q 394 457 407 460 Q 444 470 504 478 L 542 484 Z","M 340 394 Q 346 244 127 78 Q 103 68 115 59 Q 142 49 239 114 Q 320 166 394 313 Q 404 332 417 351 Q 426 360 421 371 Q 414 381 385 401 Q 363 414 353 413 Q 340 410 340 394 Z","M 966 138 Q 950 172 930 280 Q 929 296 921 302 Q 914 306 910 286 Q 885 174 864 137 Q 825 94 700 102 Q 651 106 613 124 Q 579 142 570 164 Q 543 228 580 431 Q 589 464 542 484 C 516 499 497 507 504 478 Q 504 474 507 463 Q 520 420 516 378 Q 503 194 517 143 Q 521 113 548 89 Q 639 10 843 41 Q 853 44 865 46 Q 913 59 959 91 Q 981 109 966 138 Z"],"medians":[[[275,711],[304,688],[314,669],[368,444]],[[331,710],[357,698],[601,744],[643,732],[670,702],[667,691],[624,567],[589,538]],[[388,484],[399,476],[586,512],[650,507]],[[355,398],[376,358],[347,283],[312,224],[240,143],[154,80],[120,66]],[[511,472],[539,455],[547,441],[534,261],[542,158],[565,117],[611,88],[702,67],[770,67],[828,75],[883,96],[916,124],[920,295]]]},"木":{"strokes":["M 524 533 Q 537 536 755 560 Q 768 557 779 573 Q 780 586 754 600 Q 709 627 634 603 Q 526 582 524 580 L 479 572 Q 404 563 234 546 Q 200 542 226 521 Q 265 491 291 494 Q 309 503 446 521 L 524 533 Z","M 524 580 Q 524 682 544 758 Q 559 783 532 802 Q 516 814 485 833 Q 460 851 439 834 Q 433 828 440 813 Q 474 762 476 711 Q 477 647 479 572 L 477 458 Q 474 208 466 155 Q 442 46 456 5 Q 460 -7 466 -21 Q 473 -40 481 -43 Q 488 -50 495 -41 Q 504 -37 514 -15 Q 524 10 523 44 Q 522 90 523 480 L 524 580 Z","M 446 521 Q 368 337 127 132 Q 114 119 124 117 Q 134 113 146 119 Q 276 176 403 344 Q 472 450 477 458 C 528 538 464 563 446 521 Z","M 523 480 Q 607 338 716 186 Q 737 159 774 157 Q 901 147 942 150 Q 954 151 957 157 Q 957 164 941 173 Q 773 251 721 302 Q 628 398 523 532 Q 523 533 524 533 L 524 533 C 506 558 508 506 523 480 Z"],"medians":[[[228,534],[280,522],[695,584],[728,584],[766,574]],[[453,825],[506,771],[498,218],[486,-29]],[[474,519],[459,504],[447,460],[404,389],[332,297],[244,206],[179,154],[130,124]],[[528,513],[549,470],[641,344],[749,220],[789,200],[951,159]]]},"八":{"strokes":["M 317 465 Q 318 338 155 190 Q 136 178 79 126 Q 67 110 85 113 Q 110 114 146 137 Q 258 209 325 305 Q 368 363 406 409 Q 419 422 404 441 Q 355 486 329 484 Q 316 483 317 465 Z","M 446 687 Q 507 636 530 577 Q 608 343 711 190 Q 732 163 846 151 Q 892 147 958 141 Q 983 140 984 146 Q 984 152 963 163 Q 756 269 675 396 Q 621 480 551 644 Q 530 690 483 702 Q 449 709 445 702 Q 438 692 446 687 Z"],"medians":[[[331,470],[358,421],[291,303],[204,206],[143,156],[89,123]],[[452,695],[484,681],[525,640],[645,378],[693,302],[755,227],[839,190],[978,147]]]}};
+
+const LESSONS = [
+  {t:'숫자 하나둘', c:'一二三四五'}, {t:'숫자 여섯부터 열', c:'六七八九十'},
+  {t:'요일 한자', c:'日月火水木'}, {t:'땅과 크기', c:'金土山大小'},
+  {t:'방향 찾기', c:'東西南北中'}, {t:'우리 가족', c:'父母兄弟女'},
+  {t:'사람들', c:'人王民生先'}, {t:'우리 학교', c:'學校敎室門'},
+  {t:'우리나라', c:'國韓軍萬年'}, {t:'색깔과 모양', c:'白靑長外寸'}
+];
+const OPEN_LESSONS = 10;
+
+// [훈, 음, 이야기, 낱말[[한자, 읽기, 뜻]]]
+const INFO = {
+  '一':['한','일','막대기 하나를 옆으로 눕혔어요. 손가락 하나를 펴듯, 하나를 뜻해요.',[['一生','일생','태어나서 죽을 때까지'],['一月','일월','1월']]],
+  '二':['두','이','막대기 두 개! 위는 짧게, 아래는 길게 써야 예뻐요.',[['二月','이월','2월'],['二十','이십','스물']]],
+  '三':['석','삼','막대기 세 개. 가운데가 제일 짧고, 맨 아래가 제일 길어요.',[['三寸','삼촌','아빠나 엄마의 형제'],['三月','삼월','3월']]],
+  '四':['넉','사','네모난 창문 안에 커튼이 드리워진 모양이에요. 네 귀퉁이, 넷!',[['四寸','사촌','삼촌의 아이'],['四月','사월','4월']]],
+  '五':['다섯','오','하늘과 땅 사이에서 실이 엇갈린 모양이에요. 한 손의 손가락 다섯 개!',[['五月','오월','5월'],['五十','오십','쉰']]],
+  '六':['여섯','륙','지붕 아래 다리 두 개가 있는 작은 집 모양이에요.',[['六月','유월','6월 (육월이라고 읽지 않아요!)'],['六十','육십','예순']]],
+  '七':['일곱','칠','가로줄을 칼로 싹둑 자른 모양. 꼬리가 오른쪽으로 휘어 올라가요.',[['七月','칠월','7월'],['七十','칠십','일흔']]],
+  '八':['여덟','팔','양쪽으로 쫙 갈라진 모양이에요. 팔(八)자 눈썹 알지요?',[['八月','팔월','8월'],['八十','팔십','여든']]],
+  '九':['아홉','구','팔을 구부려 끝까지 쭉 뻗은 모양. 한 자리 숫자의 마지막, 아홉!',[['九月','구월','9월'],['九十','구십','아흔']]],
+  '十':['열','십','가로와 세로가 한가운데서 딱 만나요. 꽉 찬 숫자, 열!',[['十月','시월','10월 (십월이라고 읽지 않아요!)'],['十年','십년','10년']]],
+  '日':['날','일','동그란 해를 네모나게 그렸어요. 가운데 한 줄은 반짝이는 햇빛이에요.',[['生日','생일','태어난 날'],['日月','일월','해와 달']]],
+  '月':['달','월','초승달 모양이에요. 안쪽 두 줄은 달의 무늬예요.',[['月日','월일','달과 날'],['六月','유월','6월']]],
+  '火':['불','화','활활 타오르는 불꽃이에요. 양옆의 점은 톡톡 튀는 불똥이에요.',[['火山','화산','불을 뿜는 산'],['火木','화목','땔감으로 쓰는 나무']]],
+  '水':['물','수','가운데로 흐르는 큰 물줄기와 양옆으로 튀는 물방울이에요.',[['生水','생수','끓이지 않은 맑은 물'],['山水','산수','산과 물, 경치']]],
+  '木':['나무','목','땅 위로 쭉 뻗은 줄기와 가지, 땅 아래로 뻗은 뿌리가 있는 나무예요.',[['木馬','목마','나무로 만든 말'],['土木','토목','땅과 나무를 다루는 공사']]],
+  '金':['쇠','금','땅속 깊이 반짝반짝 묻혀 있는 쇠붙이 두 알이에요. 성씨로 쓸 때는 김이라고 읽어요.',[['金메달','금메달','1등에게 주는 메달'],['白金','백금','하얀빛이 나는 귀한 금속']]],
+  '土':['흙','토','땅 위에 흙이 쌓여 새싹이 돋는 모양이에요. 아래 가로줄이 더 길어요!',[['國土','국토','나라의 땅'],['土木','토목','땅과 나무를 다루는 공사']]],
+  '山':['메','산','봉우리 세 개가 솟은 산이에요. 가운데 봉우리가 제일 높아요. 메는 산의 옛말이에요.',[['火山','화산','불을 뿜는 산'],['南山','남산','서울 한가운데 있는 산']]],
+  '大':['큰','대','사람이 두 팔을 쫙 벌리고 이만큼 커! 하는 모양이에요.',[['大門','대문','집의 큰 문'],['大學','대학','고등학교 다음에 다니는 학교']]],
+  '小':['작을','소','가운데 갈고리 양옆에 작은 점 두 개. 콩알처럼 작아요.',[['大小','대소','큰 것과 작은 것'],['小人國','소인국','작은 사람들의 나라']]],
+  '東':['동녘','동','나무(木) 사이로 해(日)가 떠오르는 쪽, 동쪽이에요.',[['東門','동문','동쪽 문'],['東西','동서','동쪽과 서쪽']]],
+  '西':['서녘','서','새가 둥지에 들어가 쉬는 해 질 녘, 해가 지는 서쪽이에요.',[['西山','서산','서쪽에 있는 산'],['東西南北','동서남북','네 방향']]],
+  '南':['남녘','남','따뜻한 햇볕이 잘 드는 쪽, 남쪽이에요.',[['南山','남산','서울 한가운데 있는 산'],['南北','남북','남쪽과 북쪽']]],
+  '北':['북녘','북','두 사람이 서로 등을 돌리고 앉은 모양이에요. 해를 등지는 추운 쪽, 북쪽! 달아날 배라는 소리도 있어요.',[['南北','남북','남쪽과 북쪽'],['北韓','북한','휴전선 북쪽']]],
+  '中':['가운데','중','네모의 한가운데를 막대가 쑥 뚫고 지나갔어요. 가운데!',[['中國','중국','우리나라 서쪽 이웃 나라'],['中學生','중학생','중학교에 다니는 학생']]],
+  '父':['아비','부','손에 도구를 들고 열심히 일하는 아빠 모양이에요.',[['父母','부모','아빠와 엄마'],['父女','부녀','아빠와 딸']]],
+  '母':['어미','모','여자(女) 모양에 점 두 개를 더했어요. 아기를 품어 주는 엄마예요.',[['母女','모녀','엄마와 딸'],['父母','부모','아빠와 엄마']]],
+  '兄':['형','형','입(口)을 크게 벌려 동생을 부르는 사람(儿), 형이에요.',[['兄弟','형제','형과 아우'],['長兄','장형','맏형']]],
+  '弟':['아우','제','끈을 차례차례 감은 모양이에요. 차례가 뒤인 사람, 동생이에요.',[['兄弟','형제','형과 아우'],['弟子','제자','가르침을 받는 사람']]],
+  '女':['계집','녀','무릎을 꿇고 두 손을 모아 앉은 여자의 모양이에요. 낱말 맨 앞에서는 여라고 읽어요.',[['女王','여왕','여자 임금'],['長女','장녀','맏딸']]],
+  '人':['사람','인','두 다리로 서서 걸어가는 사람의 옆모습이에요.',[['人生','인생','사람이 살아가는 일'],['外國人','외국인','다른 나라 사람']]],
+  '王':['임금','왕','하늘, 사람, 땅을 뜻하는 가로줄 셋을 세로줄 하나로 이었어요. 모두를 다스리는 임금!',[['女王','여왕','여자 임금'],['大王','대왕','훌륭한 임금']]],
+  '民':['백성','민','나라를 이루는 수많은 사람들, 백성이에요.',[['國民','국민','나라의 사람들'],['萬民','만민','모든 백성']]],
+  '生':['날','생','땅(土) 위로 새싹이 쏙 돋아나는 모양이에요. 태어나다, 살다!',[['先生','선생','가르치는 사람'],['學生','학생','배우는 사람']]],
+  '先':['먼저','선','발(儿)이 앞서 걸어가는 모양이에요. 남보다 먼저!',[['先生','선생','가르치는 사람'],['先王','선왕','앞선 임금']]],
+  '學':['배울','학','지붕 아래에서 아이(子)가 두 손으로 열심히 배우는 모양이에요.',[['學校','학교','배우는 곳'],['學年','학년','한 해 동안의 학교 단계']]],
+  '校':['학교','교','나무(木)로 지은 집에서 친구들과 사귀는(交) 곳, 학교예요.',[['學校','학교','배우는 곳'],['校門','교문','학교의 문']]],
+  '敎':['가르칠','교','어른이 아이(子)를 손으로 이끌며 가르치는 모양이에요. (필순 그림은 모양이 아주 비슷한 教로 보여 줘요.)',[['敎室','교실','공부하는 방'],['敎生','교생','실습하러 온 선생님']]],
+  '室':['집','실','지붕(宀) 아래 사람이 이르러(至) 머무는 방이에요.',[['敎室','교실','공부하는 방'],['王室','왕실','임금의 집안']]],
+  '門':['문','문','양쪽으로 여닫는 두 짝 문이에요.',[['大門','대문','집의 큰 문'],['校門','교문','학교의 문']]],
+  '國':['나라','국','울타리(囗) 안에서 창(戈)을 들고 땅과 사람을 지키는 나라예요.',[['韓國','한국','우리나라'],['外國','외국','다른 나라']]],
+  '韓':['한국','한','해가 돋는 아침의 나라, 우리나라 한국을 뜻해요.',[['大韓民國','대한민국','우리나라의 이름'],['韓國','한국','우리나라']]],
+  '軍':['군사','군','수레(車)를 빙 둘러싼(冖) 군사들이에요.',[['國軍','국군','나라를 지키는 군대'],['軍人','군인','군대에서 일하는 사람']]],
+  '萬':['일만','만','원래 전갈 모양이에요. 전갈은 알을 아주 많이 낳아서 아주 많다, 만이 되었어요.',[['萬一','만일','혹시라도'],['萬民','만민','모든 백성']]],
+  '年':['해','년','사람이 다 익은 벼를 지고 가는 모양이에요. 벼는 1년에 한 번 거둬요. 낱말 맨 앞에서는 연이라고 읽어요.',[['學年','학년','한 해 동안의 학교 단계'],['靑年','청년','젊은 사람']]],
+  '白':['흰','백','해(日) 위로 햇빛이 비치는 모양이에요. 하얗고 밝아요.',[['白馬','백마','하얀 말'],['白金','백금','하얀빛이 나는 귀한 금속']]],
+  '靑':['푸를','청','새싹(生)처럼 푸르고 우물물처럼 맑은 색이에요.',[['靑年','청년','젊은 사람'],['靑山','청산','푸른 산']]],
+  '長':['긴','장','긴 머리카락을 늘어뜨린 어른의 모양이에요. 길다, 어른!',[['校長','교장','학교의 가장 큰 어른'],['長女','장녀','맏딸']]],
+  '外':['바깥','외','저녁(夕)에 점(卜)을 치러 밖으로 나가요. 바깥!',[['外國','외국','다른 나라'],['外三寸','외삼촌','엄마의 남자 형제']]],
+  '寸':['마디','촌','손목에 점 하나, 맥을 짚는 손가락 한 마디예요. 가족 사이의 거리를 셀 때도 써요.',[['三寸','삼촌','아빠나 엄마의 형제'],['四寸','사촌','삼촌의 아이']]]
+};
+
+const WEEK = [
+  ['1회차','레슨 1·2 · 숫자 10자'], ['2회차','레슨 3·4 · 요일, 땅과 크기'],
+  ['3회차','레슨 5·6 · 방향, 우리 가족'], ['4회차','레슨 7·8 · 사람들, 우리 학교'],
+  ['5회차','레슨 9·10 · 우리나라, 색깔과 모양'], ['6회차','복습 · 틀린 글자 다시 쓰기'],
+  ['7회차','모의시험 · 35개 이상이면 합격']
+];
+
+/* ---------- state ---------- */
+const KEY='hanja8-mock-v1';
+let S={watch:{},trace:{},solo:{}};
+try{const s=JSON.parse(localStorage.getItem(KEY)||'null'); if(s&&s.solo) S=s;}catch(e){}
+S.quiz=S.quiz||{};   // 회차별 퀴즈 최고 점수 {'0:hun':4, ...}
+S.note=S.note||{};   // 쓰기 노트를 7칸 모두 채운 글자 {'一':1}
+// '참' 도장(S.solo) = 혼자 쓰기 성공(S.soloDone) + 쓰기 노트 완료(S.note)
+if(!S.soloDone){S.soloDone={...S.solo}; Object.keys(S.solo).forEach(c=>{if(!S.note[c]) delete S.solo[c];}); save();}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+const stampCount=()=>Object.keys(S.solo).length;
+
+/* 이름 부르기: 받침 있으면 '수현아/수현이', 없으면 '지우야/지우' */
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function hasJong(n){const c=n.charCodeAt(n.length-1);return c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28!==0;}
+const CHILD='수현';   // 성을 빼고 다정하게: 수현아, 수현이가
+const NA=()=>esc(CHILD+(hasJong(CHILD)?'아':'야'));
+const NI=()=>esc(hasJong(CHILD)?CHILD+'이':CHILD);
+
+/* ---------- helpers ---------- */
+const $=s=>document.querySelector(s);
+const view=$('#view');
+const ICON_SPK='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+function toast(t){const d=document.createElement('div');d.className='toast';d.textContent=t;document.body.appendChild(d);setTimeout(()=>d.remove(),2200);}
+/* 읽어주기: 기기에 설치된 한국어 목소리 중 가장 좋은 것을 고르고, 문장 단위로 끊어 읽음 */
+let VOICES=[];
+function loadVoices(){
+  try{VOICES=speechSynthesis.getVoices().filter(v=>/^ko/i.test(v.lang));}catch(e){}
+}
+if('speechSynthesis' in window){loadVoices();try{speechSynthesis.addEventListener('voiceschanged',loadVoices);}catch(e){speechSynthesis.onvoiceschanged=loadVoices;}}
+const rankVoice=v=>(/google/i.test(v.name)?10:0)+(/premium|프리미엄/i.test(v.name)?4:0)+(/enhanced|향상/i.test(v.name)?3:0)+(/yuna|유나/i.test(v.name)?1:0);
+function pickVoice(){
+  // 'Google 한국의'가 1순위, 없으면(아이패드) 설치된 목소리 중 프리미엄 > 향상된 품질 순
+  return VOICES.slice().sort((a,b)=>rankVoice(b)-rankVoice(a))[0];
+}
+function cleanSpeech(t){
+  return String(t)
+    .replace(/\([^)]*[一-鿿][^)]*\)/g,'')   // 팔(八)자 → 팔자
+    .replace(/[一-鿿]+/g,'')
+    .replace(/&#39;|[‘’'"“”]/g,'')
+    .replace(/[·→]/g,', ')
+    .replace(/\s+/g,' ').trim();
+}
+function speak(t){
+  try{
+    if(!('speechSynthesis' in window)) throw 0;
+    speechSynthesis.cancel();
+    const v=pickVoice();
+    (cleanSpeech(t).match(/[^.!?]+[.!?]*/g)||[]).map(s=>s.trim()).filter(Boolean).forEach(s=>{
+      const u=new SpeechSynthesisUtterance(s); u.lang='ko-KR'; if(v) u.voice=v;
+      u.rate=0.95; u.pitch=1.05; speechSynthesis.speak(u);
+    });
+  }catch(e){toast('이 기기에서는 읽어주기를 쓸 수 없어요');}
+}
+let actx;
+function chime(ok=true){
+  try{
+    actx=actx||new (window.AudioContext||window.webkitAudioContext)();
+    const notes=ok?[660,880]:[300,220];
+    notes.forEach((f,i)=>{const o=actx.createOscillator(),g=actx.createGain();o.type='sine';o.frequency.value=f;
+      const t=actx.currentTime+i*0.12;g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(0.2,t+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t+0.25);
+      o.connect(g).connect(actx.destination);o.start(t);o.stop(t+0.3);});
+  }catch(e){}
+}
+function stampFx(big='참 잘했어요',small=''){
+  const d=document.createElement('div');d.className='stampfx';
+  d.innerHTML=`<div><span>${big}${small?`<small>${small}</small>`:''}</span></div>`;
+  document.body.appendChild(d);setTimeout(()=>d.remove(),1500);
+}
+function charSVG(c,{upto=99,hl=-1,ghost=true}={}){
+  const d=STROKES[c]; if(!d) return '';
+  const p=d.strokes.map((s,i)=>{
+    const fill=i===hl?'#D23A2E':(i<upto?'#1B2A3D':(ghost?'#DCE5F0':'none'));
+    return `<path d="${s}" fill="${fill}"/>`;}).join('');
+  const grid='<path d="M512 0V1024M0 512H1024" stroke="#8FB3DE" stroke-width="6" stroke-dasharray="24 18" fill="none"/>';
+  return `<svg viewBox="0 0 1024 1024" aria-hidden="true">${grid}<g transform="translate(0,900) scale(1,-1)">${p}</g></svg>`;
+}
+const hunum=c=>INFO[c]?`${INFO[c][0]} ${INFO[c][1]}`:'';
+
+/* ---------- router ---------- */
+let cleanup=null, CUR='home', PREV='lessons';
+function go(name,arg){
+  if(cleanup){cleanup();cleanup=null;}
+  try{speechSynthesis.cancel();}catch(e){}
+  if(name==='quiz'&&CUR!=='quiz') PREV=CUR;
+  CUR=name;
+  const tab={home:'home',exam:'home',lessons:'lessons',lesson:'lessons',quiz:'lessons'}[name];
+  document.querySelectorAll('.nav button').forEach(b=>b.setAttribute('aria-current',String(b.dataset.go===tab)));
+  ({home:renderHome,exam:renderExam,lessons:renderLessons,lesson:renderLesson,quiz:renderQuiz})[name](arg);
+  window.scrollTo(0,0);
+}
+document.querySelectorAll('.nav button').forEach(b=>b.onclick=()=>go(b.dataset.go));
+
+/* ---------- home ---------- */
+const DAYS=[
+  {l:[0,1],t:'숫자 한자 10자를 끝내 볼까?'}, {l:[2,3],t:'요일이랑 땅·크기 한자 10자, 가 보자!'},
+  {l:[4,5],t:'방향이랑 가족 한자 10자, 해 볼까?'}, {l:[6,7],t:'사람이랑 학교 한자 10자, 출발!'},
+  {l:[8,9],t:'마지막 10자! 우리나라랑 색깔 한자'}, {review:true,t:'이번엔 복습하는 회차야'},
+  {exam:true,t:'모의시험 보는 회차! 실력 확인해 보자'}
+];
+const dayChars=d=>DAYS[d].l?DAYS[d].l.map(x=>LESSONS[x].c).join('').split(''):[];
+const QT=['hun','char','read','stroke'];
+const qKey=(d,t)=>`${d}:${t}`;
+const lessonDone=l=>LESSONS[l].c.split('').every(c=>S.solo[c]);
+const quizDoneCount=d=>QT.filter(t=>S.quiz[qKey(d,t)]!=null).length;
+// 회차 완료 = 레슨 글자 모두 도장 + 퀴즈 4가지 모두 한 번씩 풀기
+const dayDone=d=>DAYS[d].l?(DAYS[d].l.every(lessonDone)&&quizDoneCount(d)===QT.length):false;
+function celebrateIfDone(d,was){
+  if(d>=0&&!was&&dayDone(d)) setTimeout(()=>{chime();stampFx(`${d+1}회차 완료!`,'참 잘했어요');speak(`${NA()}, ${d+1}회차 완료! 정말 잘했어!`);},1700);
+}
+function openPlan(){
+  const cur=S.day||0;
+  const hz=cs=>`<span class="hz han">${cs.split('').map(c=>`<i class="${S.solo[c]?'ok':''}">${c}</i>`).join('')}</span>`;
+  const isDone=i=>{const D=DAYS[i];
+    if(D.l) return dayDone(i);
+    if(D.review) return LESSONS.every(x=>x.c.split('').every(c=>S.solo[c]));
+    return !!S.examDone;};
+  const card=(D,i)=>{
+    let state='', body='';
+    if(D.l){
+      const got=dayChars(i).filter(c=>S.solo[c]).length;
+      const qn=quizDoneCount(i), going=(got||qn)&&!dayDone(i);
+      state=going?`<span class="pstate">도장 ${got}/10 · 퀴즈 ${qn}/4</span>`:'';
+      if(going) body+=`<div class="pbar"><i style="width:${(got/10+qn/4)*50}%"></i></div>`;
+      body+=D.l.map(l=>`<div class="pl"><span class="pn">레슨 ${l+1}</span><span>${LESSONS[l].t}</span>${hz(LESSONS[l].c)}</div>`).join('')
+        +`<div class="pmeta">약 20분 · 한 글자씩 필순 보기 → 따라 쓰기 → 혼자 쓰기 → 쓰기 노트(도장) · 마지막에 퀴즈 5문제</div>`;
+    }else if(D.review){
+      const miss=LESSONS.flatMap(x=>x.c.split('')).filter(c=>!S.solo[c]).length;
+      body=`<div class="pl">도장 없는 글자 다시 쓰기 ${miss?`<span class="pn">${miss}자 남음</span>`:'<span class="pn">모두 받음</span>'}</div>
+        <div class="pl">놀이터 4가지 퀴즈 · 틀린 글자는 쓰기 노트에 3번씩</div>
+        <div class="pmeta">약 20분 · 헷갈리는 읽기(六月 유월, 十月 시월)를 꼭 다시 보기</div>`;
+    }else{
+      if(S.examBest!=null) state=`<span class="pstate">최고 ${S.examBest}/50</span>`;
+      body=`<div class="pl">독음 24 · 훈음 24 · 필순 2 = 50문항</div>
+        <div class="pmeta">50분 · 35개 이상이면 합격 · 끝나면 틀린 문제만 모아 보기</div>`;
+    }
+    const done=isDone(i);
+    return `<button class="pcard ${i===cur?'now':''} ${done?'done':''}" data-d="${i}">
+      ${done?'<span class="pstamp">완료</span>':''}
+      <div class="ph"><b>${i+1}회차</b><strong>${WEEK[i][1].split(' · ').pop()}</strong>${i===cur?'<span class="pstate cur">지금</span>':''}${state}</div>${body}</button>`;
+  };
+  const m=document.createElement('div'); m.className='modal';
+  m.innerHTML=`<div class="mbox" role="dialog" aria-modal="true" aria-labelledby="mt">
+    <div class="mhead"><h3 id="mt">학습 계획 · 7회</h3><button class="mclose" aria-label="닫기">✕</button></div>
+    <p class="msub">5번 공부해서 50자를 모으고, 한 번 복습한 다음 모의시험을 봐. 한 번에 한 회차, 약 20분이면 돼.<br>다 못 끝내도 괜찮아. 다음에 이어서 하면 돼! 공부할 회차를 눌러 봐.</p>
+    <div class="msum">완료한 회차 <b>${DAYS.filter((_,i)=>isDone(i)).length}</b> / 7</div>
+    <div class="mlist">${DAYS.map(card).join('')}</div>
+  </div>`;
+  const onKey=e=>{if(e.key==='Escape')close();};
+  const close=()=>{m.remove();document.removeEventListener('keydown',onKey);};
+  m.onclick=e=>{if(e.target===m)close();};
+  m.querySelector('.mclose').onclick=close;
+  m.querySelectorAll('.pcard').forEach(b=>b.onclick=()=>{S.day=+b.dataset.d;save();close();
+    if($('#todayMain')) dayPanel(S.day); else go(CUR==='lessons'?'lessons':'home');});
+  document.addEventListener('keydown',onKey);
+  document.body.appendChild(m);
+  const c=m.querySelector('.pcard.now'); if(c) c.scrollIntoView({block:'nearest'});
+}
+function lessonSec(d){
+  const D=DAYS[d], sec=$('#lessonSec');
+  if(!sec) return;
+  if(D.exam){sec.innerHTML=`<div class="sheet emptynote"><h3>${d+1}회차는 모의시험이에요</h3><p>배울 레슨은 없어요. 홈에서 모의시험을 시작해 봐!</p><button class="btn red" id="toexam">홈으로</button></div>`;$('#toexam').onclick=()=>go('home');return;}
+  const ls=D.l||LESSONS.map((_,i)=>i);
+  sec.innerHTML=`${D.l?'':'<p class="scopenote">복습 회차라서 레슨 10개가 모두 보여요.</p>'}
+    <div class="lessons">${ls.map(i=>{const l=LESSONS[i];return `
+      <button class="sheet lesson ${i>=OPEN_LESSONS?'locked':''} ${lessonDone(i)?'done':''}" data-l="${i}">
+        ${lessonDone(i)?'<span class="cstamp">완료</span>':''}<span class="n">레슨 ${i+1}</span><h3>${l.t}</h3>
+        <span class="row han">${l.c.split('').map(c=>`<span class="${S.solo[c]?'ok':''}">${c}</span>`).join('')}</span>
+      </button>`;}).join('')}</div>`;
+  sec.querySelectorAll('.lesson').forEach(b=>b.onclick=()=>{
+    const l=+b.dataset.l;
+    go('lesson',{l,i:0});});
+}
+// 도장 카드: 학습 회차는 그 회차 10자 도장판, 복습·모의시험 회차는 50자 전체
+function progressCard(d){
+  const el=$('#progressCard'); if(!el) return;
+  const D=DAYS[d], n=stampCount();
+  const overall=`<div class="overall"><span>8급 전체 ${n} / 50</span><div class="bar" role="progressbar" aria-valuenow="${n}" aria-valuemax="50"><i style="width:${n*2}%"></i></div></div>`;
+  if(D.l){
+    const cs=dayChars(d), got=cs.filter(c=>S.solo[c]).length;
+    el.innerHTML=`<div class="phead"><span class="num">${d+1}회차 도장 ${got} / 10</span></div>
+      <div class="slots han">${cs.map(c=>`<span class="${S.solo[c]?'ok':''}">${c}</span>`).join('')}</div>
+      <span class="cheerline">${dayDone(d)?`${d+1}회차 완료! 역시 ${NI()}!`:got===10?`도장 다 모았다! 퀴즈 ${4-quizDoneCount(d)}개만 더 하면 ${d+1}회차 완료!`:got?`${10-got}개만 더 받으면 ${d+1}회차 끝! ${NA()}, 힘내!`:`${NA()}, 첫 글자 도장부터 받아 볼까?`}</span>
+      ${overall}`;
+  }else{
+    el.innerHTML=`<div class="phead"><span class="num">${NI()} 도장 ${n} / 50</span></div>
+      <div class="bar" role="progressbar" aria-valuenow="${n}" aria-valuemax="50"><i style="width:${n*2}%"></i></div>
+      <span class="cheerline">${cheer(n)}</span>`;
+  }
+}
+function dayPanel(d){
+  progressCard(d);
+  const D=DAYS[d], el=$('#todayMain');
+  view.querySelectorAll('.day').forEach(b=>b.classList.toggle('now',+b.dataset.d===d));
+  let body='', btns='';
+  if(D.l){
+    const cs=dayChars(d), got=cs.filter(c=>S.solo[c]).length;
+    body=`<div class="meta">약 20분 · 레슨 ${D.l[0]+1}·${D.l[1]+1} · 한자 ${cs.length}자<br>글자마다 보고, 따라 쓰고, 혼자 쓰고, 쓰기 노트 채우기 → 퀴즈 5문제<br>${NI()}가 이미 아는 글자는 바로 <b>혼자 쓰기</b>와 <b>쓰기 노트</b>만 해도 도장 받을 수 있어!</div>`;
+    btns=`<button class="btn red" id="start">${dayDone(d)?'다시 보기':got?'이어서 하기':'시작하기'}</button><button class="btn alt" id="toquiz">퀴즈 풀기</button>`;
+  }else if(D.review){
+    const miss=LESSONS.flatMap(x=>x.c.split('')).filter(c=>!S.solo[c]);
+    body=`<div class="meta">약 20분 · 놀이터 퀴즈를 풀고, 틀린 글자는 쓰기 노트에 다시 써 봐.<br>${miss.length?`아직 도장이 없는 글자가 <b>${miss.length}개</b> 있어. 이번에 마저 받자!`:'50자 모두 도장 받았어! 퀴즈로 실력만 다지면 돼.'}</div>`;
+    btns=`<button class="btn red" id="toquiz">복습 퀴즈</button>`;
+  }else{
+    body=`<div class="examinfo"><span>독음 24 · 훈음 24 · 필순 2</span><span>50분</span><span>35개 이상 합격</span></div>
+      <div class="meta">진짜 시험처럼 조용한 곳에서 한 번에 풀어 보자.<br>끝나면 틀린 문제만 모아서 다시 볼 수 있어.
+      ${S.examBest!=null?`<br>지난 최고 점수 <b>${S.examBest} / 50</b>${S.examBest>=35?' · 합격!':''}`:''}</div>`;
+    btns=`<button class="btn red" id="exam">모의시험 시작</button>`;
+  }
+  el.innerHTML=`<div class="dayhead"><div class="eyebrow">${d+1}회차</div><button class="planbtn" id="plan">학습 계획 보기 ›</button></div>
+    <h2>${NA()}, ${D.t}</h2>${body}
+    <div style="display:flex;gap:8px;flex-wrap:wrap">${btns}</div>`;
+  const s=$('#start'), q=$('#toquiz'), e=$('#exam');
+  if(s) s.onclick=()=>{
+    const first=D.l.flatMap(l=>LESSONS[l].c.split('').map((c,i)=>({l,i,c}))).find(p=>!S.solo[p.c])||{l:D.l[0],i:0};
+    go('lesson',{l:first.l,i:first.i});};
+  if(q) q.onclick=()=>go('quiz');
+  $('#plan').onclick=openPlan;
+  const ps=$('#playSub'); if(ps) ps.textContent=D.l?`${d+1}회차 글자 10자로 풀어요`:'배운 글자 전체로 풀어요';
+  if(e) e.onclick=()=>go('exam');
+}
+function cheer(n){
+  if(n===0) return `${NA()}, 첫 도장 받으러 가 볼까?`;
+  if(n<10) return `좋은 출발이야, ${NA()}! 한 글자씩 차근차근 가 보자.`;
+  if(n<25) return `벌써 ${n}개! ${NI()} 손이 점점 한자 박사 손이 되어 가네.`;
+  if(n<50) return `절반 넘었어! ${NA()}, ${50-n}개만 더 모으면 돼.`;
+  return `50자 모두 도장! ${NI()}는 8급 시험 볼 준비 끝!`;
+}
+function renderHome(){
+  const n=stampCount();
+  view.innerHTML=`
+  <section class="sheet today" style="margin-top:8px">
+    <div class="main" id="todayMain"></div>
+  </section>
+
+  <section class="sheet progress" id="progressCard" style="margin-top:14px"></section>
+  <div class="dadwrap"><button class="dadbtn" id="dad">아빠 전용</button></div>
+
+`;
+  dayPanel(S.day||0);
+  $('#dad').onclick=openDad;
+}
+
+/* ---------- 학습 탭: 고른 회차의 레슨 + 퀴즈 ---------- */
+function tabHead(title){
+  const d=S.day||0;
+  return `<div class="tabhead"><h2>${title}</h2><span class="scope">${d+1}회차 · ${WEEK[d][1].split(' · ').pop()}</span><button class="planbtn" id="plan">회차 바꾸기 ›</button></div>`;
+}
+function renderLessons(){
+  const d=S.day||0, D=DAYS[d];
+  const ld=D.l?D.l.filter(lessonDone).length:0, qd=quizDoneCount(d);
+  view.innerHTML=tabHead('학습')+(dayDone(d)?`
+  <div class="sheet donebanner"><span class="bigstamp">참<br>잘했어요</span>
+    <div><h3>${d+1}회차 완료!</h3><p>레슨 ${D.l.length}개와 퀴즈 4개를 모두 끝냈어. 다시 들어가서 복습해도 좋아.</p></div></div>`:'')+`
+  <section class="sec" style="margin-top:14px">
+    <h2>레슨 <small>${D.l?`${ld} / ${D.l.length} 완료 · `:''}글자마다 혼자 쓰기와 쓰기 노트를 끝내면 도장</small></h2>
+    <div id="lessonSec"></div>
+  </section>
+  <section class="sec">
+    <h2>퀴즈 <small>${qd} / 4 완료 · ${D.l?`${d+1}회차 글자로 5문제씩`:'배운 글자 전체로 5문제씩'}</small></h2>
+    <div class="plays">
+      <button class="sheet play" data-p="hun"><span class="ex"><span class="han">水</span><small>→ 물 수</small></span><h3>훈음 맞히기</h3><p>한자를 보고 뜻과 소리 고르기</p><span class="tag">시험: 훈음</span></button>
+      <button class="sheet play" data-p="char"><span class="ex"><small>물 수 →</small><span class="han">水</span></span><h3>한자 찾기</h3><p>뜻과 소리에 맞는 한자 고르기</p><span class="tag">시험: 훈음</span></button>
+      <button class="sheet play" data-p="read"><span class="ex"><span class="han">父母</span><small>→ 부모</small></span><h3>읽기 퀴즈</h3><p>문장 속 한자어 읽기</p><span class="tag">시험: 독음</span></button>
+      <button class="sheet play" data-p="stroke"><span class="ex"><small>몇 번째 획?</small></span><h3>필순 퀴즈</h3><p>빨간 획을 몇 번째로 쓸까요</p><span class="tag">시험: 필순</span></button>
+    </div>
+  </section>`;
+  $('#plan').onclick=openPlan;
+  lessonSec(d);
+  view.querySelectorAll('.play').forEach(b=>{
+    const best=S.quiz[qKey(d,b.dataset.p)];
+    if(best!=null){b.classList.add('done');b.insertAdjacentHTML('afterbegin','<span class="cstamp">완료</span>');
+      b.querySelector('.tag').insertAdjacentHTML('afterend',`<span class="best">최고 ${best} / 5</span>`);}
+    b.onclick=()=>go('quiz',{type:b.dataset.p});});
+}
+
+/* ---------- lesson ---------- */
+function renderLesson({l,i}){
+  const L=LESSONS[l], c=L.c[i], [hun,eum,story,words]=INFO[c], n=STROKES[c].strokes.length;
+  view.innerHTML=`
+  <div class="tabs">
+    <button class="back" id="back">← 학습</button>
+    <span class="ttl">레슨 ${l+1} · ${L.t}</span>
+    ${L.c.split('').map((x,k)=>`<button class="ctab" data-i="${k}" aria-current="${k===i}">${x}${S.solo[x]?'<span class="dot">참</span>':''}${S.note[x]?'<span class="ndot" title="쓰기 노트 완료">✎</span>':''}</button>`).join('')}
+  </div>
+  <div class="study">
+    <section class="sheet info">
+      <div class="hero">
+        <div class="bigbox han"><span>${c}</span></div>
+        <div class="hunum">
+          <div class="hm">${hun} <em>${eum}</em></div>
+          <div class="sub">뜻(훈) <b>${hun}</b> · 소리(음) <b>${eum}</b> · ${n}획</div>
+          <button class="speak" id="say">${ICON_SPK} 읽어줘</button>
+        </div>
+      </div>
+      <div class="story"><h3>글자 이야기</h3><p>${story}</p></div>
+      <div class="words"><h3>이 글자가 들어간 낱말</h3>
+        ${words.map(w=>`<button class="word" data-r="${w[1]}"><span class="h">${w[0]}</span><span class="r">${w[1]}</span><span class="m">${w[2]}</span>${ICON_SPK}</button>`).join('')}
+      </div>
+    </section>
+    <section class="sheet write">
+      <div class="modes" role="tablist">
+        <button data-m="watch"><i>1</i>필순 보기</button>
+        <button data-m="trace"><i>2</i>따라 쓰기</button>
+        <button data-m="solo"><i>3</i>혼자 쓰기</button>
+      </div>
+      <div class="board" id="board">
+        <svg class="g" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M50 0V100M0 50H100" stroke="#8FB3DE" stroke-width=".5" stroke-dasharray="2.5 2" fill="none"/></svg>
+        <div class="w" id="w"></div>
+      </div>
+      <div class="status" id="status"></div>
+      <div class="actions" id="actions"></div>
+      <div class="hwlog" id="hwlog"></div>
+      <div class="order"><h3>필순 (${n}획)</h3><div class="strip">
+        ${STROKES[c].strokes.map((_,k)=>`<figure>${charSVG(c,{upto:k+1,hl:k})}<figcaption>${k+1}</figcaption></figure>`).join('')}
+      </div></div>
+    </section>
+  </div>
+  <section class="sheet notebook">
+    <div class="nb-head">
+      <h3>쓰기 노트 <span class="nbdone" id="nbdone" ${S.note[c]?'':'hidden'}>완료</span></h3>
+      <button class="chip" id="undo">한 획 지우기</button>
+      <button class="chip" id="clear">모두 지우기</button>
+      <span class="hint">첫 칸을 보고, 흐린 칸은 따라 쓰고, 빈칸에는 혼자 써 봐. 칸은 차례대로 하나씩 열리고, 이미 쓴 칸은 다시 눌러서 고쳐 쓸 수 있어.</span>
+    </div>
+    <div class="note" id="note"><canvas id="nbg"></canvas><canvas id="nink"></canvas></div>
+    <div class="nb-msg" id="nbmsg"></div>
+  </section>
+  <div style="display:flex;justify-content:space-between;gap:8px;margin-top:16px;flex-wrap:wrap">
+    <button class="btn alt" id="prev">← 이전 글자</button>
+    <button class="btn" id="next">다음 글자 →</button>
+  </div>`;
+
+  $('#back').onclick=()=>go('lessons');
+  view.querySelectorAll('.ctab').forEach(b=>b.onclick=()=>go('lesson',{l,i:+b.dataset.i}));
+  $('#say').onclick=()=>speak(`${hun}, ${eum}. ${story}`);
+  view.querySelectorAll('.word').forEach(b=>b.onclick=()=>speak(b.dataset.r));
+  const dl=(DAYS.find(D=>D.l&&D.l.includes(l))||{l:[l]}).l;
+  const flat=dl.flatMap(li=>LESSONS[li].c.split('').map((_,ci)=>({l:li,i:ci})));
+  const idx=flat.findIndex(p=>p.l===l&&p.i===i);
+  $('#prev').disabled=idx===0; $('#prev').style.visibility=idx===0?'hidden':'';
+  $('#prev').onclick=()=>go('lesson',flat[idx-1]);
+  $('#next').textContent=idx===flat.length-1?'오늘의 퀴즈 →':'다음 글자 →';
+  $('#next').onclick=()=>idx===flat.length-1?go('quiz'):go('lesson',flat[idx+1]);
+
+  /* writer */
+  const wEl=$('#w'), status=$('#status'), actions=$('#actions');
+  /* 따라 쓰기·혼자 쓰기 글씨 기록: 글자마다 따로 저장, 종류별 최근 3개 */
+  const HW_KEY='hanja8-hw-'+c;
+  let hw={trace:[],solo:[]}; try{hw=Object.assign(hw,JSON.parse(localStorage.getItem(HW_KEY)||'{}'));}catch(e){}
+  const hwSVG=a=>`<svg viewBox="0 0 1024 1024" aria-hidden="true"><path d="M512 0V1024M0 512H1024" stroke="#8FB3DE" stroke-width="6" stroke-dasharray="24 18" fill="none"/>
+    <g transform="translate(0,900) scale(1,-1)" fill="none" stroke="#1F5FBF" stroke-width="44" stroke-linecap="round" stroke-linejoin="round">
+    ${a.s.map(ps=>`<polyline points="${ps.map(q=>q.join(',')).join(' ')}"/>`).join('')}</g></svg>`;
+  function drawHW(){
+    const all=[...hw.solo.map(a=>({...a,k:'혼자 쓰기'})),...hw.trace.map(a=>({...a,k:'따라 쓰기'}))].sort((x,y)=>y.t-x.t);
+    $('#hwlog').innerHTML=`<h3>${NI()} 글씨 기록</h3>`+(all.length
+      ?`<div class="hwrow">${all.map(a=>{const d=new Date(a.t);return `<figure class="${a.k==='혼자 쓰기'?'solo':''}">${hwSVG(a)}
+        <figcaption><b>${a.k}</b><br>${d.getMonth()+1}/${d.getDate()} · ${a.m?`틀린 획 ${a.m}`:'한 번에 성공'}</figcaption></figure>`;}).join('')}</div>`
+      :`<p class="hwempty">따라 쓰기나 혼자 쓰기를 마치면 여기에 ${NI()} 글씨가 남아.</p>`);
+  }
+  function keepHW(kind,strokes,mistakes){
+    hw[kind]=[{t:Date.now(),m:mistakes,s:strokes},...hw[kind]].slice(0,3);
+    try{localStorage.setItem(HW_KEY,JSON.stringify(hw));}catch(e){}
+    drawHW();
+  }
+  drawHW();
+  let writer=null, mode=null;
+  const setStatus=(t,cls='')=>{status.textContent=t;status.className='status '+cls;};
+  const markModes=()=>view.querySelectorAll('.modes button').forEach(b=>{
+    b.setAttribute('aria-current',String(b.dataset.m===mode));
+    b.classList.toggle('done',!!(b.dataset.m==='solo'?S.soloDone:S[b.dataset.m])[c]);});
+  function make(opts){
+    wEl.innerHTML='';
+    const size=wEl.clientWidth;
+    writer=HanziWriter.create(wEl,c,Object.assign({
+      width:size,height:size,padding:size*0.07,
+      charDataLoader:(ch,done)=>done(STROKES[ch]),
+      strokeColor:'#1B2A3D',outlineColor:'#DCE5F0',drawingColor:'#1F5FBF',highlightColor:'#F2B632',
+      drawingWidth:Math.max(16,size/20),showHintAfterMisses:2,leniency:1.1,
+      strokeAnimationSpeed:0.9,delayBetweenStrokes:300
+    },opts));
+  }
+  function setMode(m){
+    mode=m; markModes(); actions.innerHTML='';
+    if(m==='watch'){
+      make({showCharacter:false,showOutline:true});
+      const play=()=>{setStatus(`${NA()}, 잘 봐! 한 획씩 써 볼게`);writer.hideCharacter();
+        writer.animateCharacter({onComplete:()=>{setStatus(`${n}획 끝! ${NA()}, 이제 따라 써 볼까?`,'good');S.watch[c]=1;save();markModes();}});};
+      actions.innerHTML='<button class="btn alt" id="replay">다시 보기</button><button class="btn" id="gotrace">따라 쓰기 →</button>';
+      $('#replay').onclick=play; $('#gotrace').onclick=()=>setMode('trace');
+      play();
+    }else{
+      const solo=m==='solo';
+      make({showCharacter:false,showOutline:!solo,showHintAfterMisses:solo?3:2});
+      setStatus(solo?`이번엔 ${NI()} 혼자 써 보자! 막히면 힌트가 나올 거야`:`${NA()}, 흐린 글자 위에 1번 획부터 따라 써 봐`);
+      actions.innerHTML=`<button class="btn alt" id="again">처음부터</button>`;
+      $('#again').onclick=()=>setMode(m);
+      // 획 길이 검사: 라이브러리 기본값은 본래 획의 1/4만 그어도 통과라서, 6할 이상 그어야 인정
+      const med=STROKES[c].medians.map(m=>m.reduce((s,q,k)=>k?s+Math.hypot(q[0]-m[k-1][0],q[1]-m[k-1][1]):0,0));
+      const plen=ps=>ps.reduce((s,q,k)=>k?s+Math.hypot(q.x-ps[k-1].x,q.y-ps[k-1].y):0,0);
+      let extra=0, redo=false;
+      let mine=[];   // 이번에 맞게 쓴 획들 (글자 좌표)
+      const start=from=>{redo=false; mine=mine.slice(0,from); writer.quiz({
+        quizStartStrokeNum:from,
+        onCorrectStroke:d=>{
+          const drawn=plen((d.drawnPath&&d.drawnPath.points)||[]);
+          if((drawn+40)/(med[d.strokeNum]+40)<0.6){   // 너무 짧게 그음 → 그 획부터 다시
+            redo=true; extra++;
+            setStatus(`${d.strokeNum+1}번째 획을 끝까지 쭉 그어 봐!`,'oops');
+            setTimeout(()=>start(d.strokeNum),450); return;
+          }
+          mine[d.strokeNum]=((d.drawnPath&&d.drawnPath.points)||[]).map(q=>[Math.round(q.x),Math.round(q.y)]);
+          setStatus(d.strokesRemaining?`${d.strokeNum+1}번째 획 좋아!`:'','good');},
+        onMistake:d=>setStatus(`괜찮아, ${d.strokeNum+1}번째 획 다시 해 보자. 시작점을 봐!`,'oops'),
+        onComplete:r0=>{
+          if(redo) return;
+          const r={totalMistakes:r0.totalMistakes+extra};
+          keepHW(m,mine.filter(Boolean),r.totalMistakes);
+          if(solo){
+            const had=S.solo[c]; S.soloDone[c]=1; save();
+            const how=r.totalMistakes?`혼자 쓰기 성공! 틀린 획 ${r.totalMistakes}번.`:`${NI()} 완벽해! 한 번도 안 틀렸어.`;
+            if(tryStamp(c)) setStatus(`${how} 참 잘했어요 도장!`,'good');
+            else{chime(); setStatus(had?how:`${how} 이제 아래 쓰기 노트 7칸을 채우면 도장!`,'good');}
+          }else{S[m][c]=1;save(); chime(); setStatus(`역시 ${NI()}! 이제 혼자 써 볼까?`,'good');
+            actions.insertAdjacentHTML('beforeend','<button class="btn" id="gosolo">혼자 쓰기 →</button>');$('#gosolo').onclick=()=>setMode('solo');}
+          markModes();
+        }
+      });};
+      start(0);
+    }
+  }
+  view.querySelectorAll('.modes button').forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+  setMode(S.watch[c]?(S.trace[c]?'solo':'trace'):'watch');
+
+  /* notebook */
+  cleanup=notebook(c);
+}
+
+// '참' 도장: 혼자 쓰기와 쓰기 노트를 모두 마친 순간 한 번 찍음
+function tryStamp(c){
+  if(S.solo[c]||!S.soloDone[c]||!S.note[c]) return false;
+  const dd=DAYS.findIndex(D=>D.l&&D.l.some(l=>LESSONS[l].c.includes(c))), was=dd>=0&&dayDone(dd);
+  S.solo[c]=1; save(); chime(); stampFx('참 잘했어요',`${c} ${hunum(c)}`); celebrateIfDone(dd,was);
+  const t=view.querySelector('.ctab[aria-current="true"]'); if(t&&!t.querySelector('.dot')) t.insertAdjacentHTML('beforeend','<span class="dot">참</span>');
+  return true;
+}
+function notebook(c){
+  const box=$('#note'), bg=$('#nbg'), ink=$('#nink'), msg=$('#nbmsg');
+  // 칸 0은 본보기. 1~7은 차례대로 쓰되, 이미 쓴 칸으로는 언제든 돌아가서 고쳐 쓸 수 있음
+  // 획은 글자마다 따로 저장 (용량이 커져도 도장 기록 저장에 영향 없게)
+  const INK_KEY='hanja8-ink-'+c;
+  let saved=[]; try{saved=JSON.parse(localStorage.getItem(INK_KEY)||'[]');}catch(e){}
+  const strokes=saved.map(s=>({cell:s.c,pts:s.p}));   // 전에 쓴 획 불러오기
+  let cur=null, penSeen=false, W=0, cell=0, cols=4, rows=2, active=strokes.length?strokes[strokes.length-1].cell:1;
+  const LAST=cols*rows-1;
+  const has=i=>strokes.some(s=>s.cell===i);
+  const front=()=>strokes.reduce((m,s)=>Math.max(m,s.cell),1);          // 지금까지 쓴 가장 뒤 칸
+  const reach=()=>Math.min(LAST,front()+(has(front())?1:0));           // 쓸 수 있는 가장 뒤 칸
+  function say(){
+    msg.textContent=active===LAST&&has(active)?'마지막 칸이야! 다 쓰면 끝!'
+      :active<front()?`${active}번째 칸을 고쳐 쓰는 중이야. 다 고치면 ${reach()}번째 칸으로 가자.`
+      :has(active)?`다 썼으면 ${active+1}번째 칸으로 넘어가서 써 봐.`
+      :active===1?'파란 칸부터 차례대로 한 칸씩 써 보자.':`${active}번째 칸에 써 봐.`;
+    msg.className='nb-msg';
+  }
+  function layout(){
+    // 4칸 × 2줄 = 8칸 (보기 1, 따라 쓰기 2, 혼자 쓰기 5)
+    W=box.clientWidth; cell=W/cols; const H=cell*rows;
+    box.style.height=H+'px';
+    const dpr=window.devicePixelRatio||1;
+    [bg,ink].forEach(cv=>{cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);cv.getContext('2d').setTransform(dpr,0,0,dpr,0,0);});
+    drawBg(); redraw();
+  }
+  const rect=i=>[(i%cols)*cell,Math.floor(i/cols)*cell];
+  function drawBg(){
+    const g=bg.getContext('2d'); g.clearRect(0,0,W,cell*rows);
+    g.fillStyle='#FFFFFF'; g.fillRect(0,0,W,cell*rows);
+    g.font=`700 ${cell*0.74}px "LXGW WenKai TC", "Kaiti TC", serif`; g.textAlign='center'; g.textBaseline='middle';
+    for(let idx=0;idx<=LAST;idx++){
+      const [x,y]=rect(idx);
+      if(idx===active){g.fillStyle='#EAF2FC';g.fillRect(x,y,cell,cell);}
+      else if(idx>reach()){g.fillStyle='#F7F9FB';g.fillRect(x,y,cell,cell);}
+      if(idx<3){const col=idx===0?'#9FB2C8':'#D6E2F0';g.fillStyle=col;g.strokeStyle=col;g.lineWidth=cell*0.02;g.lineJoin='round';
+        g.strokeText(c,x+cell/2,y+cell/2+cell*0.04);g.fillText(c,x+cell/2,y+cell/2+cell*0.04);}
+      g.strokeStyle='#8FB3DE'; g.lineWidth=1; g.setLineDash([5,5]);
+      g.beginPath();g.moveTo(x+cell/2,y+4);g.lineTo(x+cell/2,y+cell-4);g.moveTo(x+4,y+cell/2);g.lineTo(x+cell-4,y+cell/2);g.stroke();
+      g.setLineDash([]); g.lineWidth=2; g.strokeRect(x+1,y+1,cell-2,cell-2);
+      g.fillStyle='#9FB2C8'; g.font=`700 ${Math.max(11,cell*0.07)}px sans-serif`; g.textAlign='left'; g.textBaseline='top';
+      if(idx>0) g.fillText(String(idx),x+8,y+6);
+      g.font=`700 ${cell*0.74}px "LXGW WenKai TC", "Kaiti TC", serif`; g.textAlign='center'; g.textBaseline='middle';
+    }
+    const [ax,ay]=rect(active);   // 지금 쓸 칸
+    g.strokeStyle='#2B6CC4'; g.lineWidth=4; g.strokeRect(ax+2,ay+2,cell-4,cell-4);
+  }
+  // 획은 자기 칸 밖으로 넘어가지 않게 잘라서 그림
+  function seg(g,s,a,b){
+    const [x,y]=rect(s.cell);
+    g.save(); g.beginPath(); g.rect(x+2,y+2,cell-4,cell-4); g.clip();
+    g.lineWidth=b[2]*W; g.beginPath(); g.moveTo(a[0]*W,a[1]*W); g.lineTo(b[0]*W,b[1]*W); g.stroke();
+    g.restore();
+  }
+  function pen(g){g.strokeStyle='#1F5FBF'; g.lineCap='round'; g.lineJoin='round';}
+  function redraw(){
+    const g=ink.getContext('2d'); g.clearRect(0,0,W,cell*rows); pen(g);
+    strokes.forEach(s=>{const p=s.pts; for(let k=1;k<p.length;k++)seg(g,s,p[k-1],p[k]); if(p.length===1)seg(g,s,p[0],p[0]);});
+  }
+  function pt(e){
+    const r=ink.getBoundingClientRect();
+    const base=cell*0.055, p=e.pointerType==='pen'?(e.pressure||0.5):0.5;
+    return [(e.clientX-r.left)/W,(e.clientY-r.top)/W,(base*(0.45+p*1.1))/W];
+  }
+  function cellAt(p){return Math.min(rows-1,Math.floor(p[1]*W/cell))*cols+Math.min(cols-1,Math.floor(p[0]*W/cell));}
+  function down(e){
+    if(e.pointerType==='pen') penSeen=true;
+    if(e.pointerType==='touch'&&penSeen) return;
+    e.preventDefault();
+    const p=pt(e), i=cellAt(p);
+    if(i===0||i>reach()){
+      msg.textContent=i===0?'첫 칸은 보고 쓰는 본보기야. 파란 칸에 써 봐!':`차례대로! ${reach()}번째 칸까지만 쓸 수 있어.`;
+      msg.className='nb-msg warn'; return;
+    }
+    if(i!==active){active=i;drawBg();}   // 다음 칸으로 넘어가거나, 앞 칸으로 돌아가서 고쳐 쓰기
+    ink.setPointerCapture(e.pointerId);
+    cur={id:e.pointerId,s:{cell:active,pts:[p]}}; strokes.push(cur.s);
+    const g=ink.getContext('2d'); pen(g); seg(g,cur.s,p,p);
+  }
+  function move(e){
+    if(!cur||e.pointerId!==cur.id) return;
+    const evs=e.getCoalescedEvents?e.getCoalescedEvents():[e];
+    const g=ink.getContext('2d'); pen(g); const ps=cur.s.pts;
+    for(const ev of (evs.length?evs:[e])){const p=pt(ev);seg(g,cur.s,ps[ps.length-1],p);ps.push(p);}
+  }
+  const r3=v=>Math.round(v*1000)/1000;
+  function thin(ps){   // 너무 촘촘한 점은 덜어내서 저장 용량 줄이기
+    const out=[];
+    for(const q of ps){const l=out[out.length-1]; if(!l||Math.hypot(q[0]-l[0],q[1]-l[1])>0.002) out.push([r3(q[0]),r3(q[1]),Math.round(q[2]*10000)/10000]);}
+    return out;
+  }
+  function store(){
+    try{localStorage.setItem(INK_KEY,JSON.stringify(strokes.map(s=>({c:s.cell,p:thin(s.pts)}))));}catch(e){}
+    let first=false;
+    if(!S.note[c]&&[1,2,3,4,5,6,7].every(has)){S.note[c]=1;first=true;}
+    save();
+    if(first){   // 7칸을 처음 다 채운 순간 한 번만 축하
+      $('#nbdone').hidden=false;
+      const tab=view.querySelector('.ctab[aria-current="true"]'); if(tab&&!tab.querySelector('.ndot')) tab.insertAdjacentHTML('beforeend','<span class="ndot" title="쓰기 노트 완료">✎</span>');
+      if(tryStamp(c)){msg.textContent='쓰기 노트까지 완성! 참 잘했어요 도장!';speak(`${NA()}, ${hunum(c)} 도장 받았어! 정말 잘했어!`);}
+      else{chime(); stampFx('쓰기 노트 완료',`${c} ${hunum(c)}`); speak(`${NA()}, ${hunum(c)} 쓰기 노트 완성! 잘했어!`);
+        if(!S.soloDone[c]) msg.textContent='쓰기 노트 완성! 위에서 혼자 쓰기까지 하면 참 잘했어요 도장!';}
+    }
+  }
+  function up(e){if(cur&&e.pointerId===cur.id){cur=null;say();store();}}
+  ink.addEventListener('pointerdown',down); ink.addEventListener('pointermove',move);
+  ink.addEventListener('pointerup',up); ink.addEventListener('pointercancel',up);
+  $('#undo').onclick=()=>{strokes.pop(); active=strokes.length?strokes[strokes.length-1].cell:1; drawBg(); redraw(); say(); store();};
+  $('#clear').onclick=()=>{strokes.length=0; active=1; drawBg(); redraw(); say(); store();};   // 완료 기록은 지워지지 않음
+  const ro=new ResizeObserver(()=>{if(box.clientWidth!==W)layout();}); ro.observe(box);
+  layout(); say();
+  if(document.fonts&&document.fonts.load) document.fonts.load(`700 80px "LXGW WenKai TC"`,c).then(drawBg).catch(()=>{});
+  return ()=>ro.disconnect();
+}
+
+/* ---------- 퀴즈: 유형별로 매번 새로 섞어서 출제 ---------- */
+let POOL=[];
+// 퀴즈 문제 범위: 고른 회차의 글자(복습·모의시험 회차는 50자 전체)
+function quizPool(){
+  const d=S.day||0, D=DAYS[d];
+  return (D.l?dayChars(d):LESSONS.flatMap(x=>x.c.split(''))).filter(c=>INFO[c]);
+}
+// '문장|정답|헷갈리는 오답'  ({}가 밑줄 친 한자어)
+const READS=[
+  // 1회차: 숫자
+  '{五十} 원짜리 동전을 주웠어요.|오십|', '{六十} 분은 한 시간이에요.|육십|유십',
+  '{三十} 일 동안 매일 공부했어요.|삼십|', '받아쓰기에서 {九十} 점을 받았어요.|구십|',
+  '책을 {七十} 쪽까지 읽었어요.|칠십|', '운동장에 {四十} 명이 모였어요.|사십|',
+  '우리 집은 {十五} 층이에요.|십오|', '{十六} 일에 소풍을 가요.|십육|',
+  '도장을 {二十} 개나 모았어요.|이십|', '할아버지는 {八十} 살이세요.|팔십|',
+  // 2회차: 날짜, 자연
+  '{六月}에는 비가 많이 와요.|유월|육월', '{十月}에는 단풍이 들어요.|시월|십월',
+  '{五月} 오일은 어린이날이에요.|오월|', '{八月}에 바다에 갔어요.|팔월|',
+  '{九月}에 2학기가 시작돼요.|구월|', '{七月}에는 매미가 울어요.|칠월|',
+  '{三月}에 3학년이 되었어요.|삼월|', '{一月} 일일은 새해 첫날이에요.|일월|',
+  '{四月}에는 벚꽃이 피어요.|사월|', '{二月}은 날짜가 가장 짧은 달이에요.|이월|',
+  '{火山}이 하얀 연기를 뿜어요.|화산|', '{山水}가 아름다운 곳으로 소풍을 갔어요.|산수|',
+  '신발을 {大小}에 맞게 골랐어요.|대소|', '{土木} 공사로 새 다리를 놓아요.|토목|',
+  '{日月}은 해와 달이에요.|일월|',
+  // 3회차: 방향, 가족
+  '{東西南北} 네 방향을 배웠어요.|동서남북|', '{南北}이 하나가 되면 좋겠어요.|남북|',
+  '{東門}으로 들어가요.|동문|서문', '{南山}에 올라 서울을 내려다봤어요.|남산|북산',
+  '{西山}으로 해가 져요.|서산|', '우리 {父母}님은 나를 사랑해요.|부모|',
+  '{兄弟}끼리 사이좋게 지내요.|형제|', '{母女}가 손을 잡고 걸어가요.|모녀|부녀',
+  '{父女}가 자전거를 타요.|부녀|모녀', '{中小} 상점이 줄지어 있어요.|중소|',
+  // 4회차: 사람, 학교
+  '{先生}님께 인사를 했어요.|선생|', '나는 초등{學生}이에요.|학생|',
+  '오늘은 내 {生日}이에요!|생일|', '{學校}에 가는 길에 친구를 만났어요.|학교|',
+  '{敎室}에서 조용히 책을 읽어요.|교실|', '{校門} 앞에서 엄마를 기다려요.|교문|',
+  '{大門}을 활짝 열었어요.|대문|', '{女王}이 반짝이는 왕관을 썼어요.|여왕|녀왕',
+  '{人生}은 즐거워요.|인생|', '{大學}에 다니는 사촌 누나가 있어요.|대학|',
+  '{王室}의 보물을 박물관에서 봤어요.|왕실|', '{一生} 동안 잊지 못할 거예요.|일생|',
+  '{中學生} 형이 숙제를 도와줬어요.|중학생|', '세종{大王}은 한글을 만들었어요.|대왕|',
+  // 5회차: 나라, 색깔과 모양
+  '{大韓民國} 만세!|대한민국|', '{韓國}은 사계절이 뚜렷해요.|한국|',
+  '{外國}으로 여행을 가요.|외국|', '{外國人} 친구에게 길을 알려 주었어요.|외국인|',
+  '{中國}은 우리나라 옆에 있어요.|중국|', '{國軍} 아저씨께 감사 편지를 써요.|국군|',
+  '{軍人}은 나라를 지켜요.|군인|', '{國民} 모두가 힘을 모았어요.|국민|',
+  '{萬一}을 위해 우산을 챙겨요.|만일|', '{學年}이 올라가서 신나요.|학년|',
+  '{靑年}들이 봉사를 해요.|청년|', '{校長} 선생님 말씀을 들었어요.|교장|',
+  '{長女}인 누나가 동생을 돌봐요.|장녀|', '반에서 {室長}을 뽑았어요.|실장|',
+  '우리 {三寸}은 키가 커요.|삼촌|사촌', '{四寸} 동생이랑 놀았어요.|사촌|삼촌',
+  '{外三寸}은 엄마의 남동생이에요.|외삼촌|삼촌', '{白金} 반지가 반짝여요.|백금|',
+  '{十年} 뒤에 나는 어른이 돼요.|십년|', '{女軍} 언니가 멋져요.|여군|녀군',
+  '{靑山}에 하얀 구름이 걸렸어요.|청산|'
+];
+const QTYPES={hun:'훈음 맞히기',char:'한자 찾기',read:'읽기 퀴즈',stroke:'필순 퀴즈'};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const sample=(a,n)=>shuffle(a).slice(0,n);
+function pick4(ans,extra,pool){
+  const out=[ans,...extra.filter(Boolean)];
+  for(const x of shuffle(pool)){if(out.length>=4)break;if(!out.includes(x))out.push(x);}
+  const choices=shuffle(out); return {choices,a:choices.indexOf(ans)};
+}
+function qHun(c){
+  const [h,e]=INFO[c];
+  return {kind:QTYPES.hun,ask:'이 한자의 뜻과 소리는?',say:'이 한자의 뜻과 소리는 무엇일까?',
+    body:`<div class="bigq han">${c}</div>`,...pick4(hunum(c),[],POOL.map(hunum)),after:`${h}, ${e}`,
+    review:`<span class="han">${c}</span>의 뜻과 소리`};
+}
+function qChar(c){
+  const [h,e]=INFO[c];
+  return {kind:QTYPES.char,ask:`‘${hunum(c)}’에 알맞은 한자는?`,say:`${h}, ${e}. 알맞은 한자를 찾아봐.`,
+    body:`<div class="hq">${hunum(c)}</div>`,han:true,...pick4(c,[],POOL),after:`${h}, ${e}`,
+    review:`‘${hunum(c)}’에 맞는 한자`};
+}
+function qRead(s){
+  const [sent,ans,trap]=s.split('|');
+  const others=READS.map(x=>x.split('|')[1]).filter(r=>r!==ans);
+  const same=others.filter(r=>r.length===ans.length);
+  return {kind:QTYPES.read,ask:'밑줄 친 한자어를 어떻게 읽을까?',say:'밑줄 친 한자어를 어떻게 읽을까?',
+    body:`<div class="sent">${sent.replace(/\{(.+?)\}/,'<u>$1</u>')}</div>`,
+    ...pick4(ans,[trap],same.length>=3?same:others),after:sent.replace(/\{(.+?)\}/,ans),
+    review:sent.replace(/\{(.+?)\}/,'<u>$1</u>')};
+}
+function qStroke(c){
+  const n=STROKES[c].strokes.length, k=Math.floor(Math.random()*n);
+  const start=n<=4?0:Math.max(0,Math.min(n-4,k-Math.floor(Math.random()*4)));
+  const nums=[];for(let x=start;x<Math.min(n,start+4);x++)nums.push(`${x+1}번째`);
+  return {kind:QTYPES.stroke,ask:'빨간 획은 몇 번째로 쓸까?',say:'빨간 획은 몇 번째로 쓸까?',
+    body:charSVG(c,{upto:99,hl:k,ghost:false}),choices:nums,a:k-start,after:`${k+1}번째로 써.`,
+    review:`<span class="han">${c}</span>의 ${k+1}번째 획`};
+}
+const QN=5;   // 한 번에 5문제: 초3이 지치지 않는 분량
+function makeQuiz(type){
+  POOL=quizPool();
+  if(POOL.length<4) return [];
+  const d=S.day||0, learned=DAYS[d].l?DAYS.slice(0,d+1).flatMap((_,k)=>dayChars(k)):LESSONS.flatMap(x=>x.c.split(''));
+  const reads=READS.filter(s=>{const w=[...s.match(/\{(.+?)\}/)[1]];return w.some(c=>POOL.includes(c))&&w.every(c=>learned.includes(c));});
+  const strokeChars=POOL.filter(c=>STROKES[c].strokes.length>=3);
+  const rand=a=>a[Math.floor(Math.random()*a.length)];
+  if(type==='hun') return sample(POOL,QN).map(qHun);
+  if(type==='char') return sample(POOL,QN).map(qChar);
+  if(type==='read') return sample(reads,QN).map(qRead);
+  if(type==='stroke') return Array.from({length:QN},()=>qStroke(rand(strokeChars)));
+  return shuffle([...sample(POOL,2).map(qHun),qChar(rand(POOL)),...sample(reads,1).map(qRead),qStroke(rand(strokeChars))]);
+}
+function renderQuiz(arg){
+  const QUIZ=makeQuiz(arg&&arg.type);
+  if(!QUIZ.length){toast('문제를 만들 글자가 부족해요');go('home');return;}
+  let q=0, res=[], alive=true;
+  cleanup=()=>{alive=false;};
+  // 돌아가기 버튼: 글자 공부 화면처럼 흰 카드 바깥 왼쪽 위
+  const backBtn=()=>`<div class="tabs"><button class="back" id="qback">← ${PREV==='home'?'홈':'학습'}</button></div>`;
+  const bindBack=()=>{$('#qback').onclick=()=>go(PREV==='home'?'home':'lessons');};
+  const draw=()=>{
+    if(!alive) return;
+    if(q>=QUIZ.length) return done();
+    const Q=QUIZ[q];
+    view.innerHTML=`${backBtn()}<section class="sheet quiz">
+      <div class="qtop"><span class="kind">${Q.kind}</span><span class="dots">${QUIZ.map((_,k)=>`<i class="${k<q?(res[k]?'o':'x'):(k===q?'c':'')}"></i>`).join('')}</span><span class="count">${q+1} / ${QUIZ.length}</span></div>
+      <div class="qask">${Q.ask}<button class="speak" id="qsay">${ICON_SPK} 읽어줘</button></div>
+      <div class="qbody">${typeof Q.body==='function'?Q.body():Q.body}</div>
+      <div class="choices">${Q.choices.map((t,k)=>`<button class="choice ${Q.han?'han':''}" data-k="${k}"><span class="no">${k+1}</span>${t}</button>`).join('')}</div>
+      <div class="feedback" id="fb"></div>
+    </section>`;
+    bindBack();
+    $('#qsay').onclick=()=>speak(Q.say);
+    view.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{
+      if(view.querySelector('.choice.right')) return;
+      const k=+b.dataset.k, ok=k===Q.a;
+      view.querySelector(`.choice[data-k="${Q.a}"]`).classList.add('right');
+      if(!ok) b.classList.add('wrong');
+      res[q]=ok; chime(ok);
+      $('#fb').innerHTML=ok?`<b style="color:var(--leaf)">딩동댕! ${NI()} 정답!</b>`:`<b style="color:var(--stamp)">아깝다, 괜찮아!</b> 정답은 ${Q.choices[Q.a]}. 다음엔 맞힐 수 있어.`;
+      speak(Q.after);
+      setTimeout(()=>{q++;draw();},1800);
+    });
+  };
+  const done=()=>{
+    const s=res.filter(Boolean).length, d=S.day||0, t=arg&&arg.type;
+    if(QT.includes(t)){const was=dayDone(d), k=qKey(d,t); S.quiz[k]=Math.max(S.quiz[k]??0,s); save(); celebrateIfDone(d,was);}
+    if(s===QUIZ.length){chime();stampFx('참 잘했어요','만점!');}
+    view.innerHTML=`${backBtn()}<section class="sheet quiz"><div class="result">
+      <div class="score">${s} / ${QUIZ.length}</div>
+      <p>${s===QUIZ.length?`${NI()} 다 맞혔어! 이 기세로 계속 가 보자.`:`${NA()}, 틀린 글자는 쓰기 노트에서 한 번 더 써 보자.`}</p>
+      <p style="color:var(--ink-soft);font-size:15px">다시 풀면 문제가 새로 섞여요.</p>
+      <div class="actions"><button class="btn alt" id="re">다시 풀기</button><button class="btn" id="home">${PREV==='home'?'홈으로':'학습으로'}</button></div>
+    </div></section>`;
+    bindBack();
+    $('#re').onclick=()=>renderQuiz(arg); $('#home').onclick=()=>go(PREV==='home'?'home':'lessons');
+  };
+  draw();
+}
+
+/* ---------- 모의시험: 독음 24 · 훈음 24 · 필순 2 = 50문항, 50분, 35개 이상 합격 ---------- */
+function makeExam(){
+  POOL=LESSONS.flatMap(x=>x.c.split(''));
+  const hunChars=shuffle(POOL).slice(0,24);
+  const strokeChars=POOL.filter(c=>STROKES[c].strokes.length>=4);
+  return [...sample(READS,24).map(qRead),
+    ...hunChars.slice(0,14).map(qHun), ...hunChars.slice(14).map(qChar),
+    ...sample(strokeChars,2).map(qStroke)];
+}
+function renderExam(){
+  const QS=makeExam(), ans=Array(QS.length).fill(null), LIMIT=50*60;
+  let q=0, left=LIMIT, alive=true;
+  const fmt=s=>`${String(Math.floor(s/60)).padStart(2,'0')}:${String(s%60).padStart(2,'0')}`;
+  const part=i=>i<24?'독음':i<48?'훈음':'필순';
+  const timer=setInterval(()=>{
+    if(!alive) return;
+    left--; const el=$('#etime'); if(el) el.textContent=fmt(left);
+    if(left<=0) finish();
+  },1000);
+  cleanup=()=>{alive=false;clearInterval(timer);};
+  const askQuit=()=>{
+    $('#econfirm').innerHTML=`<div class="sheet confirmbar"><span>시험을 그만둘까? 지금까지 푼 답은 저장되지 않아.</span>
+      <button class="btn alt" id="cq">계속 풀기</button><button class="btn red" id="cy">그만두기</button></div>`;
+    $('#cq').onclick=()=>{$('#econfirm').innerHTML='';};
+    $('#cy').onclick=()=>go('home');
+  };
+  const draw=()=>{
+    if(!alive) return;
+    const Q=QS[q], done=ans.filter(a=>a!=null).length, last=q===QS.length-1;
+    view.innerHTML=`<div class="tabs"><button class="back" id="eback">← 홈</button><span class="ttl">모의시험</span><span class="etime" id="etime">${fmt(left)}</span></div>
+    <div id="econfirm"></div>
+    <section class="sheet quiz">
+      <div class="qtop"><span class="kind">${part(q)} · ${q+1}번</span><span class="count">푼 문제 ${done} / ${QS.length}</span></div>
+      <div class="pbar"><i style="width:${done/QS.length*100}%"></i></div>
+      <div class="qask">${Q.ask}<button class="speak" id="qsay">${ICON_SPK} 읽어줘</button></div>
+      <div class="qbody">${Q.body}</div>
+      <div class="choices">${Q.choices.map((t,k)=>`<button class="choice ${Q.han?'han':''} ${ans[q]===k?'picked':''}" data-k="${k}"><span class="no">${k+1}</span>${t}</button>`).join('')}</div>
+      <div class="enav"><button class="btn alt" id="eprev" ${q===0?'disabled':''}>← 이전 문제</button>
+        ${last?'<button class="btn red" id="esubmit">답안 내기</button>':'<button class="btn" id="enext">다음 문제 →</button>'}</div>
+    </section>`;
+    $('#eback').onclick=askQuit;
+    $('#qsay').onclick=()=>speak(Q.say);
+    view.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{ans[q]=+b.dataset.k; if(!last) q++; draw();});
+    $('#eprev').onclick=()=>{if(q>0){q--;draw();}};
+    const n=$('#enext'); if(n) n.onclick=()=>{q++;draw();};
+    const s=$('#esubmit'); if(s) s.onclick=()=>{
+      const miss=ans.filter(a=>a==null).length;
+      if(miss&&!s.dataset.sure){s.dataset.sure='1';s.textContent=`안 푼 문제 ${miss}개! 그래도 내기`;return;}
+      finish();};
+  };
+  function finish(){
+    if(!alive) return;
+    alive=false; clearInterval(timer);
+    const ok=i=>ans[i]===QS[i].a;
+    const score=QS.filter((_,i)=>ok(i)).length, pass=score>=35;
+    const partScore=(a,b)=>QS.slice(a,b).filter((_,k)=>ok(a+k)).length;
+    S.examDone=true; S.examBest=Math.max(S.examBest||0,score); save();
+    chime(pass); if(pass) stampFx('합격!',`${score}점`);
+    speak(pass?`합격이야! ${NA()}, 정말 대단해!`:`${NA()}, ${35-score}개만 더 맞히면 합격이야. 틀린 문제를 같이 보자.`);
+    const wrong=QS.map((Q,i)=>({Q,i})).filter(({i})=>!ok(i));
+    view.innerHTML=`<div class="tabs"><button class="back" id="eback">← 홈</button><span class="ttl">모의시험 결과</span></div>
+    <section class="sheet quiz">
+      <div class="result">
+        <div class="score">${score} / ${QS.length}</div>
+        <p class="${pass?'passmsg':'failmsg'}">${pass?`합격이야! ${NA()}, 정말 대단해!`:`${35-score}개만 더 맞히면 합격이야. ${NA()}, 틀린 문제를 같이 보자!`}</p>
+        <div class="examinfo"><span>독음 ${partScore(0,24)} / 24</span><span>훈음 ${partScore(24,48)} / 24</span><span>필순 ${partScore(48,50)} / 2</span><span>걸린 시간 ${fmt(LIMIT-left)}</span></div>
+      </div>
+      ${wrong.length?`<h3 class="wtitle">틀린 문제 ${wrong.length}개</h3><div class="wrongs">${wrong.map(({Q,i})=>`
+        <div class="wrong"><span class="wn">${i+1}번</span><span class="wq">${Q.review}</span>
+        <span class="wa">정답 <b>${Q.choices[Q.a]}</b> · ${ans[i]!=null?`고른 답 ${Q.choices[ans[i]]}`:'안 풀었음'}</span></div>`).join('')}</div>`:''}
+      <div class="actions"><button class="btn alt" id="again">새 시험 보기</button><button class="btn" id="tohome">홈으로</button></div>
+    </section>`;
+    $('#eback').onclick=()=>go('home'); $('#tohome').onclick=()=>go('home'); $('#again').onclick=()=>go('exam');
+  }
+  draw();
+}
+
+/* ---------- 아빠 전용: 비밀번호(숫자 키패드) → 기록 초기화 ---------- */
+const DAD_PIN='4488';   // 아이가 실수로 지우지 않게 막는 용도 (보안용 비밀번호 아님)
+function resetDay(d){
+  const D=DAYS[d];
+  if(D.l) dayChars(d).forEach(c=>{
+    ['watch','trace','solo','soloDone','note'].forEach(k=>{delete S[k][c];});
+    try{localStorage.removeItem('hanja8-ink-'+c);localStorage.removeItem('hanja8-hw-'+c);}catch(e){}
+  });
+  if(D.exam){delete S.examDone; delete S.examBest;}
+  QT.forEach(t=>{delete S.quiz[qKey(d,t)];});
+  save();
+}
+function resetAll(){
+  try{Object.keys(localStorage).filter(k=>k.startsWith('hanja8-')).forEach(k=>localStorage.removeItem(k));}catch(e){}
+  S={watch:{},trace:{},solo:{},soloDone:{},note:{},quiz:{},day:0}; save();
+}
+function openDad(){
+  const m=document.createElement('div'); m.className='modal';
+  let pin='', changed=false;
+  const onKey=e=>{
+    if(e.key==='Escape') close();
+    else if(m.querySelector('.pinpad')&&/^[0-9]$/.test(e.key)) press(e.key);
+    else if(m.querySelector('.pinpad')&&e.key==='Backspace') press('del');
+  };
+  const close=()=>{m.remove();document.removeEventListener('keydown',onKey);if(changed) go(CUR==='lessons'?'lessons':'home');};
+  const head=t=>`<div class="mhead"><h3 id="dt">${t}</h3><button class="mclose" aria-label="닫기">✕</button></div>`;
+  // 키패드 화면은 한 번만 그리고, 누를 때는 동그라미와 안내 문구만 바꿈 (깜빡임 방지)
+  function lock(){
+    m.innerHTML=`<div class="mbox dadbox" role="dialog" aria-modal="true" aria-labelledby="dt">${head('아빠 전용')}
+      <p class="msub">비밀번호 4자리를 눌러 주세요.</p>
+      <div class="pindots">${[0,1,2,3].map(()=>'<i></i>').join('')}</div>
+      <p class="pinmsg"></p>
+      <div class="pinpad">${['1','2','3','4','5','6','7','8','9','','0','del'].map(k=>k?`<button data-k="${k}" ${k==='del'?'aria-label="한 자리 지우기"':''}>${k==='del'?'⌫':k}</button>`:'<span></span>').join('')}</div>
+    </div>`;
+    m.querySelector('.mclose').onclick=close;
+    m.querySelectorAll('.pinpad button').forEach(b=>b.onclick=()=>press(b.dataset.k));
+  }
+  function dots(){m.querySelectorAll('.pindots i').forEach((el,k)=>el.classList.toggle('on',k<pin.length));}
+  function press(k){
+    if(k==='del') pin=pin.slice(0,-1); else if(pin.length<4) pin+=k;
+    m.querySelector('.pinmsg').textContent='';
+    dots();
+    if(pin.length<4) return;
+    if(pin===DAD_PIN){pin='';panel();return;}
+    pin='';
+    setTimeout(()=>{   // 4번째 동그라미를 잠깐 보여 준 뒤 흔들고 비우기
+      const pd=m.querySelector('.pindots'); if(!pd) return;
+      pd.classList.remove('shake'); void pd.offsetWidth; pd.classList.add('shake');
+      m.querySelector('.pinmsg').textContent='비밀번호가 달라요. 다시 눌러 주세요.'; dots();
+    },150);
+  }
+  function summary(d){
+    const D=DAYS[d], qn=quizDoneCount(d);
+    if(D.l) return `도장 ${dayChars(d).filter(c=>S.solo[c]).length}/10 · 쓰기 노트 ${dayChars(d).filter(c=>S.note[c]).length}/10 · 퀴즈 ${qn}/4`;
+    if(D.review) return `퀴즈 ${qn}/4`;
+    return S.examBest!=null?`모의시험 최고 ${S.examBest}/50`:'모의시험 기록 없음';
+  }
+  function panel(note=''){
+    m.innerHTML=`<div class="mbox dadbox" role="dialog" aria-modal="true" aria-labelledby="dt">${head('아빠 전용 · 기록 관리')}
+      ${note?`<p class="dadnote">${note}</p>`:''}
+      <div class="dadsec"><h4>회차별 기록 초기화</h4>
+        <p>그 회차의 도장, 쓰기 노트, 글씨 기록, 퀴즈 점수를 지워요. 다른 회차 기록은 그대로예요.</p>
+        <div>${DAYS.map((D,d)=>`<div class="dadrow"><b>${d+1}회차</b><span>${summary(d)}</span><button data-reset="${d}">초기화</button></div>`).join('')}</div></div>
+      <div class="dadsec"><h4>전체 기록 초기화</h4>
+        <p>도장, 퀴즈, 모의시험, 쓰기 노트, 글씨 기록을 모두 지우고 1회차부터 다시 시작해요.</p>
+        <button class="btn warnbtn" data-reset="all">전체 기록 지우기</button></div>
+      <div id="dadconfirm"></div>
+    </div>`;
+    m.querySelector('.mclose').onclick=close;
+    m.querySelectorAll('[data-reset]').forEach(b=>b.onclick=()=>ask(b.dataset.reset));
+  }
+  function ask(target){
+    const label=target==='all'?'전체':`${+target+1}회차`;
+    const box=m.querySelector('#dadconfirm');
+    box.innerHTML=`<div class="sheet confirmbar"><span><b>${label}</b> 기록을 지울까요? 지우면 되돌릴 수 없어요.</span>
+      <button class="btn alt" id="dn">취소</button><button class="btn warnbtn" id="dy">지우기</button></div>`;
+    box.scrollIntoView({block:'nearest'});
+    m.querySelector('#dn').onclick=()=>{box.innerHTML='';};
+    m.querySelector('#dy').onclick=()=>{
+      if(target==='all') resetAll(); else resetDay(+target);
+      changed=true; panel(`${label} 기록을 지웠어요.`);
+    };
+  }
+  m.onclick=e=>{if(e.target===m)close();};
+  document.addEventListener('keydown',onKey);
+  lock(); document.body.appendChild(m);
+}
+
+go('home');
+</script>
+
+</body>
+</html>
